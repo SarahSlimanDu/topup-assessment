@@ -13,24 +13,24 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Commons
         }
         public void Add(T entity)
         {
-              _context.Set<T>().Add(entity);  
+            _context.Set<T>().Add(entity);
         }
 
         public async Task<IEnumerable<T>> GetAll()
         {
-           return await _context.Set<T>().ToListAsync();
+            return await _context.Set<T>().ToListAsync();
         }
 
         public async Task<T?> GetById<TKey>(TKey id) where TKey : notnull
         {
-           return await _context.Set<T>().FindAsync(id);
+            return await _context.Set<T>().FindAsync(id);
         }
 
         public void Update(T entity)
         {
-            _context.Set<T>().Update(entity);   
+            _context.Set<T>().Update(entity);
         }
 
-     
+
     }
 }

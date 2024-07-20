@@ -1,11 +1,10 @@
-﻿
-
+﻿using TopUpBeneficiary.Application.Services.TopUp.Handlers.Base;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate;
 using TopUpBeneficiary.Domain.UserAggregate;
 
-namespace TopUpBeneficiary.Application.Services.TopUp.ChainOfResponsibilities
+namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
 {
-    public class DebitUserAccount : ApplyTopUp
+    public class DebitUserBalanceHandler : Handler
     {
         public override async Task HandleAsync(User user, Beneficiary beneficiary, int topUpAmount)
         {
@@ -14,10 +13,10 @@ namespace TopUpBeneficiary.Application.Services.TopUp.ChainOfResponsibilities
 
             var response = "200";
 
-            if(response == "200")
+            if (response == "200")
             {
                 //update the debit transaction status
-               // await base.HandleAsync(user, beneficiary, topUpAmount);
+                // await base.HandleAsync(user, beneficiary, topUpAmount);
             }
 
             else

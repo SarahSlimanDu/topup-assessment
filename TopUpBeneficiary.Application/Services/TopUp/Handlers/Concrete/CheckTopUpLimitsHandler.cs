@@ -1,31 +1,31 @@
-﻿
+﻿using TopUpBeneficiary.Application.Services.TopUp.Handlers.Base;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
 using TopUpBeneficiary.Domain.UserAggregate;
 
-namespace TopUpBeneficiary.Application.Services.TopUp.ChainOfResponsibilities
+namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
 {
-    public class CheckTopUpLimits : ApplyTopUp
+    public class CheckTopUpLimitsHandler : Handler
     {
         private readonly ITopUpTransactionRepository _topUpRepository;
-        public CheckTopUpLimits(ITopUpTransactionRepository topUpRepository)
+        public CheckTopUpLimitsHandler(ITopUpTransactionRepository topUpRepository)
         {
-                _topUpRepository = topUpRepository;
+            _topUpRepository = topUpRepository;
         }
 
         public override async Task HandleAsync(User user, Beneficiary beneficiary, int topUpAmount)
         {
             ///get sum of all top up actions during this month for this beneficiary
-            
+
             var sumTopUpAmount = await _topUpRepository.SumTopUpsInCurrentMonthForUserPerBeneficiary(user.Id, beneficiary.Id);
             var sumTopUpForUserBeneficiaries = await _topUpRepository.SumTopUpsTnCurrentMonthForUserBeneficiaries(user.Id);
 
-            if ((user.IsVerified && sumTopUpAmount >= 1000) || (!user.IsVerified && sumTopUpAmount >= 500)) //TODO: this shouldn't be hard coded
+            if (user.IsVerified && sumTopUpAmount >= 1000 || !user.IsVerified && sumTopUpAmount >= 500) //TODO: this shouldn't be hard coded
             {
 
                 throw new Exception();
             }
-            else if(sumTopUpForUserBeneficiaries >= 3000)
+            else if (sumTopUpForUserBeneficiaries >= 3000)
             {
                 throw new Exception();
             }

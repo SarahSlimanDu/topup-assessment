@@ -1,6 +1,8 @@
 ﻿using TopUpBeneficiary.Domain.BeneficiaryAggregate;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate.ValueObjects;
 using TopUpBeneficiary.Domain.Commons.Model;
+using TopUpBeneficiary.Domain.TopUpOptionsAggregate;
+using TopUpBeneficiary.Domain.TopUpOptionsAggregate.ValueObjects;
 using TopUpBeneficiary.Domain.TopUpTransactionAggregate.ValueObjects;
 using TopUpBeneficiary.Domain.UserAggregate;
 using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
@@ -11,30 +13,31 @@ namespace TopUpBeneficiary.Domain.TopUpTransactionAggregate
     {
         public UserId UserId { get; private set; }
         public BeneficiaryId BeneficiaryId { get; private set; }
-        public int TopUpAmount { get; private set; }    
+        public TopUpOptionId TopUpOptionId { get; private set; }    
         public int Charge {  get; private set; }    
         public string Status { get; private set; }  
         public DateTime CreatedDateTime { get; private set; }   
         public DateTime UpdatedDateTime { get; private set; }   
         public User User { get; private set; }  
-        public Beneficiary Beneficiary { get; private set; }    
-        private TopUpTransaction(TopUpTransactionId id, UserId userId, BeneficiaryId beneficiaryId,int topUpAmount,int charge, string status, DateTime createdDateTime, DateTime updatedDateTime) : base(id)
+        public Beneficiary Beneficiary { get; private set; } 
+        public TopUpOption TopUpOption { get; private set; }    
+        private TopUpTransaction(TopUpTransactionId id, UserId userId, BeneficiaryId beneficiaryId, TopUpOptionId topUpOptionId,int charge, string status, DateTime createdDateTime, DateTime updatedDateTime) : base(id)
         {
             UserId = userId;
             BeneficiaryId = beneficiaryId;
-            TopUpAmount = topUpAmount;  
+            TopUpOptionId = topUpOptionId;  
             Charge = charge;
             Status = status;
             CreatedDateTime = createdDateTime;
             UpdatedDateTime = updatedDateTime;
         }
 
-        public static TopUpTransaction Create(UserId userId, BeneficiaryId beneficiaryId, int topUpAmount, int charge, string status)
+        public static TopUpTransaction Create(UserId userId, BeneficiaryId beneficiaryId, TopUpOptionId topUpOptionId, int charge, string status)
         {
             return new(TopUpTransactionId.CreateUnique(),
                        userId,
                        beneficiaryId,
-                       topUpAmount,
+                       topUpOptionId,
                        charge,
                        status,
                        DateTime.UtcNow,

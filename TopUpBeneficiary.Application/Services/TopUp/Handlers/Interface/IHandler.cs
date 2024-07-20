@@ -1,0 +1,12 @@
+﻿using TopUpBeneficiary.Application.Services.TopUp.Handlers.Base;
+using TopUpBeneficiary.Domain.BeneficiaryAggregate;
+using TopUpBeneficiary.Domain.UserAggregate;
+
+namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Interface
+{
+    public interface IHandler
+    {
+        Handler SetNext(Handler handler);
+        Task HandleAsync(User user, Beneficiary beneficiary, int topUpAmount);
+    }
+}

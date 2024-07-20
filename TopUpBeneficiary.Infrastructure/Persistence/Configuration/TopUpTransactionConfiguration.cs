@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate.ValueObjects;
+using TopUpBeneficiary.Domain.TopUpOptionsAggregate.ValueObjects;
 using TopUpBeneficiary.Domain.TopUpTransactionAggregate;
 using TopUpBeneficiary.Domain.TopUpTransactionAggregate.ValueObjects;
 using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
@@ -31,6 +32,12 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Configuration
                 t => t.Value,
                 value => BeneficiaryId.Create(value));
 
+            builder.Property(t => t.TopUpOptionId)
+              .ValueGeneratedNever()
+              .HasConversion(
+                t => t.Value,
+                value => TopUpOptionId.Create(value));
+
             builder.HasOne(t => t.User)
            .WithMany()  
            .HasForeignKey(t => t.UserId)
@@ -39,6 +46,11 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Configuration
             builder.HasOne(t => t.Beneficiary)
                 .WithMany() 
                 .HasForeignKey(t => t.BeneficiaryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(t => t.TopUpOption)
+                .WithMany()
+                .HasForeignKey(t => t.TopUpOptionId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

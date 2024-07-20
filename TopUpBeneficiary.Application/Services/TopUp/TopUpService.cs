@@ -1,30 +1,42 @@
-﻿
-
-using System.Collections.Generic;
-using System.Diagnostics;
-using TopUpBeneficiary.Application.Dtos.Request;
-using TopUpBeneficiary.Application.Services.TopUp.ChainOfResponsibilities;
+﻿using TopUpBeneficiary.Application.Dtos.Request;
+using TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete;
+using TopUpBeneficiary.Application.Services.TopUp.Handlers.Interface;
+using TopUpBeneficiary.Domain.BeneficiaryAggregate.ValueObjects;
+using TopUpBeneficiary.Domain.Commons.Enums;
+using TopUpBeneficiary.Domain.Persistence.Interfaces.Commons;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
-using TopUpBeneficiary.Domain.UserAggregate;
+using TopUpBeneficiary.Domain.TopUpOptionsAggregate.ValueObjects;
+using TopUpBeneficiary.Domain.TopUpTransactionAggregate;
 using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
 
 namespace TopUpBeneficiary.Application.Services.TopUp
 {
     public class TopUpService : ITopUpService
     {
-        private readonly IApplyTopUp _applyTopUp;
+        private readonly IHandler _handler;
         private readonly IUserRepository _userRepository;
         private readonly ITopUpOptionsRepository _topUpOptionsRepository;
         private readonly ITopUpTransactionRepository _topUpTransactionRepository;
-        public TopUpService(IApplyTopUp applyTopUp, 
-                            IUserRepository userRepository,
+        private readonly IBeneficiaryRepository _beneficiaryRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        public TopUpService(IUserRepository userRepository,
                             ITopUpOptionsRepository topUpOptionsRepository,
-                            ITopUpTransactionRepository topUpTransactionRepository)
-        {
-            _applyTopUp = applyTopUp;   
+                            ITopUpTransactionRepository topUpTransactionRepository,
+                            IBeneficiaryRepository beneficiaryRepository,
+                            IUnitOfWork unitOfWork)
+        { 
             _userRepository = userRepository;
             _topUpOptionsRepository = topUpOptionsRepository;  
-            _topUpTransactionRepository = topUpTransactionRepository;   
+            _topUpTransactionRepository = topUpTransactionRepository;
+            _beneficiaryRepository = beneficiaryRepository;
+            _unitOfWork = unitOfWork;   
+
+            //build the chain
+            var firstHandler = new CheckBeneficiaryStatusHandler();
+            firstHandler.SetNext(new CheckTopUpLimitsHandler(_topUpTransactionRepository))
+                        .SetNext(new CheckUserBalanceHandler())
+                        .SetNext(new DebitUserBalanceHandler());
+            _handler = firstHandler;
         }
         public Task GetTopUpOptions()
         {
@@ -33,16 +45,38 @@ namespace TopUpBeneficiary.Application.Services.TopUp
 
         public async Task TopUpBeneficiary(TopUpRequest topUpRequest)
         {
-            var topUpOption = await _topUpOptionsRepository.GetById(topUpRequest.topUpOptionId);
-            _applyTopUp.SetNext(new BeneficiaryStatus())
-                       .SetNext(new CheckTopUpLimits(_topUpTransactionRepository))
-                       .SetNext(new CheckUserBalance())
-                       .SetNext(new DebitUserAccount());
-            //Check Beneficiary Existence and Status (Exist and active)
-            //Check Verification and Top-Up Limits for Beneficiary (user verified or not and related limits)
-            //Check Monthly Top - Up Limit for All Beneficiaries(monthly limit)
-            //Check User Balance 
-            //Debit User Account
+            //test
+            var topUpOption = await _topUpOptionsRepository.GetById(TopUpOptionId.Create(topUpRequest.topUpOptionId));
+            if (topUpOption is null)
+                throw new Exception();
+
+            //test
+            var user = await _userRepository.GetById(UserId.Create(topUpRequest.UserId));
+            if(user is null)
+                throw new Exception();
+
+            //test
+            var beneficiary = await _beneficiaryRepository.GetById(BeneficiaryId.Create(topUpRequest.BeneficiaryId));
+            if (beneficiary is null)
+                throw new Exception();
+
+            //insert row in top up transaction with initial status
+             _topUpTransactionRepository.Add(TopUpTransaction.Create(user.Id, beneficiary.Id, topUpOption.Id, 1, TopUpTransactionStatus.Pending.ToString()));
+            await _unitOfWork.Save();
+
+            try
+            {
+                await _handler.HandleAsync(user,
+                                           beneficiary,
+                                           topUpOption.Amount);
+            }
+            catch (Exception ex)
+            {
+                //update the transaction to Failed
+                throw;
+            }
+
+           
             throw new NotImplementedException();
         }
     }

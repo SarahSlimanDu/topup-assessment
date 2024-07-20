@@ -18,14 +18,16 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Repository
             return await _context.Set<TopUpTransaction>().Where(t => t.UserId == userId
                                                                   && t.BeneficiaryId == beneficiaryId
                                                                   && t.CreatedDateTime.Date.Month == DateTime.UtcNow.Month)
-                                                         .SumAsync(t => t.TopUpAmount);
+                                                         .Include(t => t.TopUpOption)
+                                                         .SumAsync(t => t.TopUpOption.Amount);
         }
 
         public async Task<int> SumTopUpsTnCurrentMonthForUserBeneficiaries(UserId userId)
         {
            return await _context.Set<TopUpTransaction>().Where(t => t.UserId == userId
                                                      && t.CreatedDateTime.Date.Month == DateTime.UtcNow.Month)
-                                            .SumAsync(t => t.TopUpAmount);
+                                                        .Include(t => t.TopUpOption)
+                                                        .SumAsync(t => t.TopUpOption.Amount);   
         }
     }
 }
