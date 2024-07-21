@@ -13,9 +13,9 @@ namespace Accounts.Infrastructure.Persistence.Repository
         {
             _dbSet = context.Set<Account>();
         }
-        public Task GetBalance(AccountId accountId)
+        public async Task<Account?> GetAccountById(AccountId accountId)
         {
-            throw new NotImplementedException();
+           return await _dbSet.SingleOrDefaultAsync(a => a.Id == accountId);  
         }
     }
 }

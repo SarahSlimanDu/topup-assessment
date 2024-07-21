@@ -1,23 +1,38 @@
-﻿using TopUpBeneficiary.Application.Services.TopUp.Handlers.Base;
+﻿using Commons.Errors;
+using Commons.HttpRequestBuild;
+using TopUpBeneficiary.Application.Services.TopUp.Handlers.Base;
+using TopUpBeneficiary.Application.SyncDataService.WebService.Client;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate;
+using TopUpBeneficiary.Domain.Errors;
 using TopUpBeneficiary.Domain.UserAggregate;
 
 namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
 {
     public class CheckUserBalanceHandler : Handler
     {
-        public override async Task HandleAsync(User user, Beneficiary beneficiary, int topUpAmount)
+        private readonly IAccountExternalService _accountExternalService;
+        public CheckUserBalanceHandler(IAccountExternalService accountExternalService)
         {
-            //we should call external Api to get the balance
-            var userAccountBalance = 90;
-            if (userAccountBalance < topUpAmount)
+               _accountExternalService = accountExternalService;
+        }
+
+        public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount)
+        {
+            var result = await _accountExternalService.GetBalance(user.AccountId);
+
+            if (result.IsSuccess)
             {
-                throw new Exception();
+                if (result.Value.Balance < topUpAmount)
+                {
+                    return Result.Failure(UserErrors.NotFoundById());
+                }
+                else
+                {
+                    return await base.HandleAsync(user, beneficiary, topUpAmount);
+                }
             }
             else
-            {
-                await base.HandleAsync(user, beneficiary, topUpAmount);
-            }
+                return result.Error;
         }
     }
 }

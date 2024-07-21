@@ -1,8 +1,11 @@
-﻿namespace Accounts.Application.Services
+﻿using Accounts.Application.Dtos.Response;
+using Commons.Errors;
+
+namespace Accounts.Application.Services
 {
     public interface IAccountService
     {
-        Task GetBalance(Guid accountId);
+        Task<Result<GetBalanceResponse>> GetBalance(Guid accountId);
         Task DebitBalance(Guid accountId, decimal amount);
     }
 }

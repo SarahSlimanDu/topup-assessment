@@ -2,7 +2,7 @@
 
 namespace TopUpBeneficiary.Application.Dtos.Request
 {
-    public class TopUpRequest
+    public sealed class TopUpRequest
     {
         public Guid UserId { get; set; }    
         public Guid BeneficiaryId { get; set; }

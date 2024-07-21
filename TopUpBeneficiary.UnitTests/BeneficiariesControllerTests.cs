@@ -14,7 +14,7 @@ public class BeneficiariesControllerTests
     {
         //Arrange
         var serviceStub = new Mock<IBeneficiaryService>();
-        serviceStub.Setup(service => service.GetBeneficiaries(It.IsAny<Guid>())).ReturnsAsync((IList<BeneficiaryDto>)null);
+      //  serviceStub.Setup(service => service.GetBeneficiaries(It.IsAny<Guid>())).ReturnsAsync((IList<BeneficiaryDto>)null);
         
         var controller = new BeneficiariesController(serviceStub.Object);
 

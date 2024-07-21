@@ -1,9 +1,10 @@
-﻿using Accounts.Domain.AccountAggregate.ValueObjects;
+﻿using Accounts.Domain.AccountAggregate;
+using Accounts.Domain.AccountAggregate.ValueObjects;
 
 namespace Accounts.Domain.Interface
 {
     public interface IAccountRepository
     {
-        Task GetBalance(AccountId accountId);
+        Task<Account?> GetAccountById(AccountId accountId);
     }
 }

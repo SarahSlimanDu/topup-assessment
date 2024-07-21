@@ -1,8 +1,11 @@
-﻿using TopUpBeneficiary.Application.Dtos.Request;
+﻿using Commons.Errors;
+using TopUpBeneficiary.Application.Dtos.Request;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Interface;
+using TopUpBeneficiary.Application.SyncDataService.WebService.Client;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate.ValueObjects;
 using TopUpBeneficiary.Domain.Commons.Enums;
+using TopUpBeneficiary.Domain.Errors;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Commons;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
 using TopUpBeneficiary.Domain.TopUpOptionsAggregate.ValueObjects;
@@ -18,23 +21,26 @@ namespace TopUpBeneficiary.Application.Services.TopUp
         private readonly ITopUpOptionsRepository _topUpOptionsRepository;
         private readonly ITopUpTransactionRepository _topUpTransactionRepository;
         private readonly IBeneficiaryRepository _beneficiaryRepository;
+        private readonly IAccountExternalService _accountExternalService;
         private readonly IUnitOfWork _unitOfWork;
         public TopUpService(IUserRepository userRepository,
                             ITopUpOptionsRepository topUpOptionsRepository,
                             ITopUpTransactionRepository topUpTransactionRepository,
                             IBeneficiaryRepository beneficiaryRepository,
+                            IAccountExternalService accountExternalService,
                             IUnitOfWork unitOfWork)
-        { 
+        {
             _userRepository = userRepository;
-            _topUpOptionsRepository = topUpOptionsRepository;  
+            _topUpOptionsRepository = topUpOptionsRepository;
             _topUpTransactionRepository = topUpTransactionRepository;
             _beneficiaryRepository = beneficiaryRepository;
-            _unitOfWork = unitOfWork;   
+            _accountExternalService = accountExternalService;
+            _unitOfWork = unitOfWork;
 
             //build the chain
             var firstHandler = new CheckBeneficiaryStatusHandler();
             firstHandler.SetNext(new CheckTopUpLimitsHandler(_topUpTransactionRepository))
-                        .SetNext(new CheckUserBalanceHandler())
+                        .SetNext(new CheckUserBalanceHandler(_accountExternalService))
                         .SetNext(new DebitUserBalanceHandler());
             _handler = firstHandler;
         }
@@ -43,41 +49,42 @@ namespace TopUpBeneficiary.Application.Services.TopUp
             throw new NotImplementedException();
         }
 
-        public async Task TopUpBeneficiary(TopUpRequest topUpRequest)
+        public async Task<Result> TopUpBeneficiary(TopUpRequest topUpRequest)
         {
             //test
             var topUpOption = await _topUpOptionsRepository.GetById(TopUpOptionId.Create(topUpRequest.topUpOptionId));
             if (topUpOption is null)
-                throw new Exception();
+                return Result.Failure(TopUpOptionsErrors.NotFoundById());
 
             //test
             var user = await _userRepository.GetById(UserId.Create(topUpRequest.UserId));
-            if(user is null)
-                throw new Exception();
+            if (user is null)
+                return Result.Failure(UserErrors.NotFoundById());
 
             //test
             var beneficiary = await _beneficiaryRepository.GetById(BeneficiaryId.Create(topUpRequest.BeneficiaryId));
             if (beneficiary is null)
-                throw new Exception();
+                return Result.Failure(BeneficiaryErrors.NotFoundById());
 
             //insert row in top up transaction with initial status
-             _topUpTransactionRepository.Add(TopUpTransaction.Create(user.Id, beneficiary.Id, topUpOption.Id, 1, TopUpTransactionStatus.Pending.ToString()));
+            _topUpTransactionRepository.Add(TopUpTransaction.Create(user.Id, beneficiary.Id, topUpOption.Id, 1, TopUpTransactionStatus.Pending.ToString()));
             await _unitOfWork.Save();
 
-            try
+
+            var chainResult = await _handler.HandleAsync(user,
+                                             beneficiary,
+                                             topUpOption.Amount);
+
+            if (chainResult.IsSuccess)
             {
-                await _handler.HandleAsync(user,
-                                           beneficiary,
-                                           topUpOption.Amount);
+                //update the transaction to success
             }
-            catch (Exception ex)
+            else
             {
-                //update the transaction to Failed
-                throw;
+                //update the transaction to failed
             }
 
-           
-            throw new NotImplementedException();
+            return chainResult;
         }
     }
 }

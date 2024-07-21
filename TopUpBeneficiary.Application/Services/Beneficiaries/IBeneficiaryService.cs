@@ -1,4 +1,5 @@
 ﻿
+using Commons.Errors;
 using TopUpBeneficiary.Application.Dtos.Response;
 
 namespace TopUpBeneficiary.Application.Services.Beneficiaries
@@ -6,6 +7,6 @@ namespace TopUpBeneficiary.Application.Services.Beneficiaries
     public interface IBeneficiaryService
     {
         Task AddBeneficiary();
-        Task<IList<BeneficiaryDto>?> GetBeneficiaries(Guid userId);
+        Task<Result<IList<BeneficiaryDto>?>> GetBeneficiaries(Guid userId);
     }
 }

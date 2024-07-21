@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopUpBeneficiary.Api", "Top
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopUpBeneficiary.UnitTests", "TopUpBeneficiary.UnitTests\TopUpBeneficiary.UnitTests.csproj", "{4CD34813-EAEA-4CBD-8E43-AE0634B69CC6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microservices", "Microservices", "{48CA4507-4EF9-460D-9D4D-0E303AEE4C43}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{48CA4507-4EF9-460D-9D4D-0E303AEE4C43}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TopUpMicroService", "TopUpMicroService", "{B8FD55C9-BEA3-461F-9D7C-109706EA0F5A}"
 EndProject
@@ -19,15 +19,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopUpBeneficiary.Infrastruc
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AccountsMicroService", "AccountsMicroService", "{B78AAC90-3D06-4A1C-870C-A58E3852B676}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounts.Api", "Accounts.Api\Accounts.Api.csproj", "{111C3303-3237-4E26-997F-210E9F4B7157}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accounts.Api", "Accounts.Api\Accounts.Api.csproj", "{111C3303-3237-4E26-997F-210E9F4B7157}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounts.Application", "Accounts.Application\Accounts.Application.csproj", "{617C9609-FF05-487D-AF11-871598C3686E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accounts.Application", "Accounts.Application\Accounts.Application.csproj", "{617C9609-FF05-487D-AF11-871598C3686E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounts.Domain", "Accounts.Domain\Accounts.Domain.csproj", "{7E00D6D8-FEAC-4F6C-A57B-F9ED39FF8A09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accounts.Domain", "Accounts.Domain\Accounts.Domain.csproj", "{7E00D6D8-FEAC-4F6C-A57B-F9ED39FF8A09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons", "Commons\Commons.csproj", "{944EBCE8-C823-4A33-ABA2-788E7025FDBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commons", "Commons\Commons.csproj", "{944EBCE8-C823-4A33-ABA2-788E7025FDBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounts.Infrastructure", "Accounts.Infrastructure\Accounts.Infrastructure.csproj", "{DD623BCF-BBD3-4BA0-8E55-CB3B44E0E431}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accounts.Infrastructure", "Accounts.Infrastructure\Accounts.Infrastructure.csproj", "{DD623BCF-BBD3-4BA0-8E55-CB3B44E0E431}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{611C0842-A2D9-40E4-8AF6-C48E398EDC24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +91,7 @@ Global
 		{111C3303-3237-4E26-997F-210E9F4B7157} = {B78AAC90-3D06-4A1C-870C-A58E3852B676}
 		{617C9609-FF05-487D-AF11-871598C3686E} = {B78AAC90-3D06-4A1C-870C-A58E3852B676}
 		{7E00D6D8-FEAC-4F6C-A57B-F9ED39FF8A09} = {B78AAC90-3D06-4A1C-870C-A58E3852B676}
+		{944EBCE8-C823-4A33-ABA2-788E7025FDBA} = {48CA4507-4EF9-460D-9D4D-0E303AEE4C43}
 		{DD623BCF-BBD3-4BA0-8E55-CB3B44E0E431} = {B78AAC90-3D06-4A1C-870C-A58E3852B676}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
