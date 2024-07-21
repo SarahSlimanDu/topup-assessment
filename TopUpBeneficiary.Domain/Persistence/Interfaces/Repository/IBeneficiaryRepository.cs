@@ -6,6 +6,6 @@ namespace TopUpBeneficiary.Domain.Persistence.Interfaces.Repository
 {
     public interface IBeneficiaryRepository : IRepository<Beneficiary>
     {
-        Task<IEnumerable<Beneficiary>> GetByUserId(UserId userId);
+        Task<IEnumerable<Beneficiary>> GetActiveBeneficiariesByUserId(UserId userId);
     }
 }

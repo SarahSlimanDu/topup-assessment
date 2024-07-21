@@ -1,14 +1,12 @@
-﻿
-
-using Commons.Errors;
+﻿using Commons.Errors;
 using TopUpBeneficiary.Application.Dtos.Request;
-using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
+using TopUpBeneficiary.Application.Dtos.Response;
 
 namespace TopUpBeneficiary.Application.Services.TopUp
 {
     public interface ITopUpService
     {
-        Task GetTopUpOptions();
-        Task<Result> TopUpBeneficiary(TopUpRequest topUpRequest);
+        Task<Result<IList<TopUpOptionsDto>>> GetTopUpOptions();
+        Task<Result> TopUpBeneficiary(TopUpDto topUpRequest);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using TopUpBeneficiary.Application.Dtos.Request;
 using TopUpBeneficiary.Application.Dtos.Response;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate;
 
@@ -10,6 +11,7 @@ namespace TopUpBeneficiary.Api.Commons.MappingConfig
         {
             config.NewConfig<Beneficiary, BeneficiaryDto>()
                 .Map(dest => dest.BeneficiaryId, src => src.Id.Value);
+                
         }
     }
 }

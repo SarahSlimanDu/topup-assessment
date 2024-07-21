@@ -1,7 +1,10 @@
-﻿using Accounts.Application.Dtos.Response;
+﻿using Accounts.Application.Dtos.Request;
+using Accounts.Application.Dtos.Response;
 using Accounts.Domain.AccountAggregate.ValueObjects;
+using Accounts.Domain.Enums;
 using Accounts.Domain.Errors;
 using Accounts.Domain.Interface;
+using Accounts.Domain.TransactionAggregate;
 using Commons.Errors;
 
 namespace Accounts.Application.Services
@@ -9,14 +12,30 @@ namespace Accounts.Application.Services
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
-        public AccountService(IAccountRepository accountRepository)
+        private readonly ITransactionRepository _transactionRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        public AccountService(IAccountRepository accountRepository, ITransactionRepository transactionRepository, IUnitOfWork unitOfWork)
         {
-                
-            _accountRepository = accountRepository; 
+            _accountRepository = accountRepository;
+            _transactionRepository = transactionRepository;
+            _unitOfWork = unitOfWork;
         }
-        public async Task DebitBalance(Guid accountId, decimal amount)
+        public async Task<Result> DebitBalance(DebitBalanceRequest request)
         {
-            throw new NotImplementedException();
+            var account = await _accountRepository.GetAccountById(AccountId.Create(request.AccountId));
+            if (account is null)
+            {
+                return Result.Failure<GetBalanceResponse>(AccountErrors.NotFoundById());
+            }
+            _transactionRepository.Add(Transaction.Create(AccountId.Create(request.AccountId),TransactionType.Debit.ToString(), request.Amount));
+         
+            account.DebitBalance(request.Amount);
+
+            _accountRepository.UpdateAccount(account);
+
+            await _unitOfWork.Save();
+
+            return Result.Success();    
         }
 
         public async Task<Result<GetBalanceResponse>> GetBalance(Guid accountId)

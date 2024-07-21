@@ -5,7 +5,7 @@ using TopUpBeneficiary.Application.Services.TopUp;
 
 namespace TopUpBeneficiary.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/topup")]
     public class TopUpController : ApiController
     {
         private readonly ITopUpService _topUpService;
@@ -15,10 +15,17 @@ namespace TopUpBeneficiary.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> TopUp(TopUpRequest request)
+        public async Task<IActionResult> TopUp(TopUpDto request)
         {
            var result =  await _topUpService.TopUpBeneficiary(request);
             return result.IsSuccess ? NoContent() : Problem(result);
+        }
+
+        [HttpGet("options")]
+        public async Task<IActionResult> GetTopUpOptions()
+        {
+            var result = await _topUpService.GetTopUpOptions();
+            return result.IsSuccess ? Ok(result) : Problem(result);
         }
     }
 }

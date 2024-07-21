@@ -13,7 +13,7 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Repository
         {
         }
 
-        public async Task<IEnumerable<Beneficiary>> GetByUserId(UserId userId)
+        public async Task<IEnumerable<Beneficiary>> GetActiveBeneficiariesByUserId(UserId userId)
         {
             return await _context.Set<Beneficiary>().Where(b => b.UserId == userId
                                                              && b.IsActive).ToListAsync();

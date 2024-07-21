@@ -23,11 +23,11 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
             if (user.IsVerified && sumTopUpAmount >= 1000 || !user.IsVerified && sumTopUpAmount >= 500) //TODO: this shouldn't be hard coded
             {
 
-                return Result.Failure(UserErrors.NotFoundById());
+                return Result.Failure(TopUpTransactionErrors.ExceedBeneficiaryLimit());
             }
             else if (sumTopUpForUserBeneficiaries >= 3000)
             {
-                return Result.Failure(UserErrors.NotFoundById());
+                return Result.Failure(TopUpTransactionErrors.ExceedMonthlyLimit());
             }
             else
             {

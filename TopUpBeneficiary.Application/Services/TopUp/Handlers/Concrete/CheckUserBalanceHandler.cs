@@ -24,7 +24,7 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
             {
                 if (result.Value.Balance < topUpAmount)
                 {
-                    return Result.Failure(UserErrors.NotFoundById());
+                    return Result.Failure(UserErrors.NoEnoughBalance());
                 }
                 else
                 {

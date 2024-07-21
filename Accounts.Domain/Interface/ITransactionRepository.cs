@@ -5,6 +5,5 @@ namespace Accounts.Domain.Interface
     public interface ITransactionRepository
     {
         void Add(Transaction transaction);
-        Task Save();
     }
 }

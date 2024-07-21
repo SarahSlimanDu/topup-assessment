@@ -14,12 +14,8 @@ namespace Accounts.Infrastructure.Persistence.Repository
         }
         public void Add(Transaction transaction)
         {
-            throw new NotImplementedException();
+            _dbSet.Add(transaction);    
         }
 
-        public Task Save()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

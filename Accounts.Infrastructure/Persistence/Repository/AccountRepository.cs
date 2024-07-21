@@ -15,7 +15,12 @@ namespace Accounts.Infrastructure.Persistence.Repository
         }
         public async Task<Account?> GetAccountById(AccountId accountId)
         {
-           return await _dbSet.SingleOrDefaultAsync(a => a.Id == accountId);  
+            return await _dbSet.SingleOrDefaultAsync(a => a.Id == accountId);
+        }
+
+        public void UpdateAccount(Account account)
+        {
+            _dbSet.Update(account);
         }
     }
 }

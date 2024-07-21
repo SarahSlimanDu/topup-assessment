@@ -1,8 +1,7 @@
 ﻿
-
 namespace TopUpBeneficiary.Application.Dtos.Response
 {
-    public class BeneficiaryDto
+    public sealed record BeneficiaryDto
     {
         public Guid BeneficiaryId { get; set; } 
         public string PhoneNumber { get;  set; }

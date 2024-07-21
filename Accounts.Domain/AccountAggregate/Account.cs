@@ -35,5 +35,11 @@ namespace Accounts.Domain.AccountAggregate
                        DateTime.UtcNow,
                        DateTime.UtcNow);
         }
+
+        public void DebitBalance(decimal debitedAmount)
+        {
+            this.Balance -= debitedAmount;
+            this.UpdatedDateTime = DateTime.UtcNow;
+        }
     }
 }

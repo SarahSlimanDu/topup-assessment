@@ -18,6 +18,8 @@ namespace Accounts.Infrastructure
             });
 
             services.AddScoped<IAccountRepository, AccountRepository>();    
+            services.AddScoped<ITransactionRepository, TransactionRepository>();    
+            services.AddScoped<IUnitOfWork, UnitOfWork>();    
             return services;
         }
     }

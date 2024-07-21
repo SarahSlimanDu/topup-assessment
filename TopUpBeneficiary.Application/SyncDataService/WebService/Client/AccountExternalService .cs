@@ -33,16 +33,16 @@ namespace TopUpBeneficiary.Application.SyncDataService.WebService.Client
                 if (balanceResponse != null)
                     return Result.Success(balanceResponse);
                 else
-                    return Result.Failure<GetBalanceResponse>(UserErrors.NotFoundById());//TODO: change
+                    throw new Exception("Something went wrong");//TODO : re-check
             }
             else
             {
-                var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(content);//TODO: what if errorResponse is null
+                var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(content);
 
-                if (errorResponse.StatusCode == ErrorTypes.NotFound.ToString())
-                    return Result.Failure<GetBalanceResponse>(UserErrors.NotFoundById());//TODO: change
+                if (errorResponse != null && errorResponse.StatusCode == ErrorTypes.NotFound.ToString())
+                    return Result.Failure<GetBalanceResponse>(UserErrors.AccountNotFound());
                 else
-                    return Result.Failure<GetBalanceResponse>(UserErrors.NotFoundById());//TODO: change to 500;
+                    throw new Exception("Something went wrong");
             }
         }
 

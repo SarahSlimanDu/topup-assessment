@@ -1,4 +1,5 @@
-﻿using Accounts.Application.Services;
+﻿using Accounts.Application.Dtos.Request;
+using Accounts.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Accounts.Api.Controllers
@@ -19,6 +20,13 @@ namespace Accounts.Api.Controllers
             var result = await _accountService.GetBalance(accountId);
 
             return result.IsSuccess ? Ok(result.Value) : Problem(result);
+        }
+        [HttpPost("debit")]
+        public async Task<IActionResult> DebitBalance(DebitBalanceRequest request )
+        {
+            var result = await _accountService.DebitBalance(request);
+
+            return result.IsSuccess ? NoContent() : Problem(result);
         }
     }
 }

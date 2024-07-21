@@ -1,5 +1,7 @@
 ﻿using Commons.Errors;
+using MapsterMapper;
 using TopUpBeneficiary.Application.Dtos.Request;
+using TopUpBeneficiary.Application.Dtos.Response;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Interface;
 using TopUpBeneficiary.Application.SyncDataService.WebService.Client;
@@ -23,12 +25,14 @@ namespace TopUpBeneficiary.Application.Services.TopUp
         private readonly IBeneficiaryRepository _beneficiaryRepository;
         private readonly IAccountExternalService _accountExternalService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
         public TopUpService(IUserRepository userRepository,
                             ITopUpOptionsRepository topUpOptionsRepository,
                             ITopUpTransactionRepository topUpTransactionRepository,
                             IBeneficiaryRepository beneficiaryRepository,
                             IAccountExternalService accountExternalService,
-                            IUnitOfWork unitOfWork)
+                            IUnitOfWork unitOfWork,
+                            IMapper mapper)
         {
             _userRepository = userRepository;
             _topUpOptionsRepository = topUpOptionsRepository;
@@ -36,6 +40,7 @@ namespace TopUpBeneficiary.Application.Services.TopUp
             _beneficiaryRepository = beneficiaryRepository;
             _accountExternalService = accountExternalService;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
 
             //build the chain
             var firstHandler = new CheckBeneficiaryStatusHandler();
@@ -44,12 +49,8 @@ namespace TopUpBeneficiary.Application.Services.TopUp
                         .SetNext(new DebitUserBalanceHandler());
             _handler = firstHandler;
         }
-        public Task GetTopUpOptions()
-        {
-            throw new NotImplementedException();
-        }
 
-        public async Task<Result> TopUpBeneficiary(TopUpRequest topUpRequest)
+        public async Task<Result> TopUpBeneficiary(TopUpDto topUpRequest)
         {
             //test
             var topUpOption = await _topUpOptionsRepository.GetById(TopUpOptionId.Create(topUpRequest.topUpOptionId));
@@ -77,14 +78,21 @@ namespace TopUpBeneficiary.Application.Services.TopUp
 
             if (chainResult.IsSuccess)
             {
-                //update the transaction to success
+                //TODO:update the transaction to success
             }
             else
             {
-                //update the transaction to failed
+                //TODO:update the transaction to failed
             }
 
             return chainResult;
+        }
+
+        public async Task<Result<IList<TopUpOptionsDto>>> GetTopUpOptions()
+        {
+           var topUpOptions =  await _topUpOptionsRepository.GetAll();
+           var result =  _mapper.Map<IList<TopUpOptionsDto>>(topUpOptions.ToList());
+            return Result.Success(result);
         }
     }
 }
