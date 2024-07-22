@@ -1,5 +1,7 @@
 ﻿using Commons.Errors;
+using TopUpBeneficiary.Application.Dtos.Request;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Base;
+using TopUpBeneficiary.Application.SyncDataService.WebService.Client;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate;
 using TopUpBeneficiary.Domain.Errors;
 using TopUpBeneficiary.Domain.UserAggregate;
@@ -8,24 +10,17 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
 {
     public class DebitUserBalanceHandler : Handler
     {
-        public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount)
+        private readonly IAccountClient _accountClient;
+        public DebitUserBalanceHandler(IAccountClient accountClient)
         {
-            //we have to call external Api to debit the account/
-            //if this call return 200 then every thing done successfully.
+            _accountClient = accountClient;  
+        }
+        public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount, int charge)
+        {
+            var debitBalance = new DebitBalanceDto(user.AccountId.Value, topUpAmount + charge);
+            var result = await _accountClient.DebitBalance(debitBalance);
 
-            var response = "200";
-
-            if (response == "200")
-            {
-                //update the debit transaction status
-                // await base.HandleAsync(user, beneficiary, topUpAmount);
-                return Result.Success();
-            }
-
-            else
-            {
-                return Result.Failure(UserErrors.NotFoundById());
-            }
+            return result;
 
         }
     }

@@ -8,12 +8,12 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
 {
     public class CheckBeneficiaryStatusHandler : Handler
     {
-        public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount)
+        public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount, int charge)
         {
             if (!beneficiary.IsActive)
                 return Result.Failure(BeneficiaryErrors.NotActive());
             else
-                return await base.HandleAsync(user, beneficiary, topUpAmount);
+                return await base.HandleAsync(user, beneficiary, topUpAmount,charge);
         }
     }
 }

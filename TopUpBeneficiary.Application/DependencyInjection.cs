@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using TopUpBeneficiary.Application.Services.Beneficiaries;
 using TopUpBeneficiary.Application.Services.TopUp;
 using TopUpBeneficiary.Application.SyncDataService.WebService.Client;
@@ -16,7 +17,7 @@ namespace TopUpBeneficiary.Application
 
             services.Configure<AccountServiceSettings>(configuration.GetSection(nameof(AccountServiceSettings)));
 
-            services.AddHttpClient<IAccountExternalService, AccountExternalService>();
+            services.AddHttpClient<IAccountClient, AccountClient>();
 
             return services;
         }

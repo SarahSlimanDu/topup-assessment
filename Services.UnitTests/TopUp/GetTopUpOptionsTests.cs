@@ -1,0 +1,91 @@
+﻿using FluentAssertions;
+using MapsterMapper;
+using Moq;
+using TopUpBeneficiary.Application.Dtos.Response;
+using TopUpBeneficiary.Application.Services.TopUp;
+using TopUpBeneficiary.Application.Services.TopUp.Handlers.Interface;
+using TopUpBeneficiary.Application.SyncDataService.WebService.Client;
+using TopUpBeneficiary.Domain.Errors;
+using TopUpBeneficiary.Domain.Persistence.Interfaces.Commons;
+using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
+using TopUpBeneficiary.Domain.TopUpOptionsAggregate;
+
+namespace Services.UnitTests.TopUp
+{
+    public class GetTopUpOptionsTests
+    {
+        private readonly Mock<IHandler> _handlerMock;
+        private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<ITopUpOptionsRepository> _topUpOptionsRepositoryMock;
+        private readonly Mock<ITopUpTransactionRepository> _topUpTransactionRepositoryMock;
+        private readonly Mock<IBeneficiaryRepository> _beneficiaryRepositoryMock;
+        private readonly Mock<IAccountClient> _accountClientMock;
+        private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly Mock<IMapper> _mapperMock;
+        private readonly TopUpService _topUpService;
+
+        public GetTopUpOptionsTests()
+        {
+            _handlerMock = new Mock<IHandler>();
+            _userRepositoryMock = new Mock<IUserRepository>();
+            _topUpOptionsRepositoryMock = new Mock<ITopUpOptionsRepository>();
+            _topUpTransactionRepositoryMock = new Mock<ITopUpTransactionRepository>();
+            _beneficiaryRepositoryMock = new Mock<IBeneficiaryRepository>();
+            _accountClientMock = new Mock<IAccountClient>();
+            _unitOfWorkMock = new Mock<IUnitOfWork>();
+            _mapperMock = new Mock<IMapper>();
+
+            _topUpService = new TopUpService(
+                _userRepositoryMock.Object,
+                _topUpOptionsRepositoryMock.Object,
+                _topUpTransactionRepositoryMock.Object,
+                _beneficiaryRepositoryMock.Object,
+                _accountClientMock.Object,
+                _unitOfWorkMock.Object,
+                _mapperMock.Object
+            );
+        }
+
+        [Fact]
+        public async Task GetTopUpOptions_ShouldReturnNotFound_WhenNoOptionsExist()
+        {
+            // Arrange
+            _topUpOptionsRepositoryMock.Setup(repo => repo.GetAll()).ReturnsAsync(new List<TopUpOption>());
+
+            // Act
+            var result = await _topUpService.GetTopUpOptions();
+
+            // Assert
+            result.IsFailure.Should().BeTrue();
+            result.Error.Should().Be(TopUpOptionsErrors.NoOptionsFound());
+        }
+
+        [Fact]
+        public async Task GetTopUpOptions_ShouldReturnOptions_WhenOptionsExist()
+        {
+            // Arrange
+            var topUpOptions = new List<TopUpOption>
+            {
+                TopUpOption.Create(10),
+                TopUpOption.Create(20)
+            };
+            var topUpOptionsDto = new List<TopUpOptionsDto>
+        {
+            new TopUpOptionsDto { Id = topUpOptions[0].Id.Value, Amount = topUpOptions[0].Amount, CreatedDateTime = topUpOptions[0].CreatedDateTime },
+            new TopUpOptionsDto { Id = topUpOptions[1].Id.Value, Amount = topUpOptions[1].Amount, CreatedDateTime = topUpOptions[1].CreatedDateTime}
+        };
+
+            _topUpOptionsRepositoryMock.Setup(repo => repo.GetAll()).ReturnsAsync(topUpOptions);
+            _mapperMock.Setup(mapper => mapper.Map<IList<TopUpOptionsDto>>(It.IsAny<IList<TopUpOption>>())).Returns(topUpOptionsDto);
+
+            // Act
+            var result = await _topUpService.GetTopUpOptions();
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().NotBeNull();
+            result.Value.Should().HaveCount(2);
+            result.Value.Should().BeEquivalentTo(topUpOptionsDto);
+        }
+    }
+}

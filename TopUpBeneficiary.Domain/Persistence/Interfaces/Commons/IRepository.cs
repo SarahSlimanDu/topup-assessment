@@ -4,7 +4,7 @@
     {
         Task<T?> GetById<TKey>(TKey id) where TKey : notnull;
         Task<IEnumerable<T>> GetAll();
-        void Add(T entity);
+        T Add(T entity);
         void Update(T entity);
     }
 }

@@ -7,5 +7,7 @@ namespace Accounts.Domain.Interface
     {
         Task<Account?> GetAccountById(AccountId accountId);
         void UpdateAccount(Account account);
+        Task<IEnumerable<Account>> GetAllAccounts();
+        void Add(Account account);  
     }
 }

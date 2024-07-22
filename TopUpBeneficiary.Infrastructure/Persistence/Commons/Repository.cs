@@ -11,9 +11,10 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Commons
         {
             _context = context;
         }
-        public void Add(T entity)
+        public T Add(T entity)
         {
             _context.Set<T>().Add(entity);
+            return entity;  
         }
 
         public async Task<IEnumerable<T>> GetAll()

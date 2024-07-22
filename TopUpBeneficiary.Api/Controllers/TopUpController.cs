@@ -25,7 +25,7 @@ namespace TopUpBeneficiary.Api.Controllers
         public async Task<IActionResult> GetTopUpOptions()
         {
             var result = await _topUpService.GetTopUpOptions();
-            return result.IsSuccess ? Ok(result) : Problem(result);
+            return result.IsSuccess ? Ok(result.Value) : Problem(result);
         }
     }
 }

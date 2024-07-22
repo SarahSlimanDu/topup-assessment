@@ -8,6 +8,6 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Interface
     public interface IHandler
     {
         Handler SetNext(Handler handler);
-        Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount);
+        Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount, int charge);
     }
 }

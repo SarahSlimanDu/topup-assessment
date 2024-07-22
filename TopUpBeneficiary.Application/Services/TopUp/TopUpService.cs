@@ -23,14 +23,15 @@ namespace TopUpBeneficiary.Application.Services.TopUp
         private readonly ITopUpOptionsRepository _topUpOptionsRepository;
         private readonly ITopUpTransactionRepository _topUpTransactionRepository;
         private readonly IBeneficiaryRepository _beneficiaryRepository;
-        private readonly IAccountExternalService _accountExternalService;
+        private readonly IAccountClient _accountClient;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+
         public TopUpService(IUserRepository userRepository,
                             ITopUpOptionsRepository topUpOptionsRepository,
                             ITopUpTransactionRepository topUpTransactionRepository,
                             IBeneficiaryRepository beneficiaryRepository,
-                            IAccountExternalService accountExternalService,
+                            IAccountClient accountClient,
                             IUnitOfWork unitOfWork,
                             IMapper mapper)
         {
@@ -38,15 +39,15 @@ namespace TopUpBeneficiary.Application.Services.TopUp
             _topUpOptionsRepository = topUpOptionsRepository;
             _topUpTransactionRepository = topUpTransactionRepository;
             _beneficiaryRepository = beneficiaryRepository;
-            _accountExternalService = accountExternalService;
+            _accountClient = accountClient;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
 
             //build the chain
             var firstHandler = new CheckBeneficiaryStatusHandler();
             firstHandler.SetNext(new CheckTopUpLimitsHandler(_topUpTransactionRepository))
-                        .SetNext(new CheckUserBalanceHandler(_accountExternalService))
-                        .SetNext(new DebitUserBalanceHandler());
+                        .SetNext(new CheckUserBalanceHandler(_accountClient))
+                        .SetNext(new DebitUserBalanceHandler(_accountClient));
             _handler = firstHandler;
         }
 
@@ -68,22 +69,26 @@ namespace TopUpBeneficiary.Application.Services.TopUp
                 return Result.Failure(BeneficiaryErrors.NotFoundById());
 
             //insert row in top up transaction with initial status
-            _topUpTransactionRepository.Add(TopUpTransaction.Create(user.Id, beneficiary.Id, topUpOption.Id, 1, TopUpTransactionStatus.Pending.ToString()));
+            var topUpTransaction = _topUpTransactionRepository.Add(TopUpTransaction
+                                       .Create(user.Id, beneficiary.Id, topUpOption.Id, 1, TopUpTransactionStatus.Pending.ToString()));
             await _unitOfWork.Save();
 
 
             var chainResult = await _handler.HandleAsync(user,
                                              beneficiary,
-                                             topUpOption.Amount);
+                                             topUpOption.Amount,
+                                             1);//TODO: change this
 
             if (chainResult.IsSuccess)
             {
-                //TODO:update the transaction to success
+               topUpTransaction.UpdateStatus(TopUpTransactionStatus.Success.ToString());    
             }
             else
             {
-                //TODO:update the transaction to failed
+                topUpTransaction.UpdateStatus(TopUpTransactionStatus.Success.ToString());
             }
+            _topUpTransactionRepository.Update(topUpTransaction);
+            await _unitOfWork.Save(); 
 
             return chainResult;
         }
@@ -91,8 +96,15 @@ namespace TopUpBeneficiary.Application.Services.TopUp
         public async Task<Result<IList<TopUpOptionsDto>>> GetTopUpOptions()
         {
            var topUpOptions =  await _topUpOptionsRepository.GetAll();
+            if(topUpOptions.Count() == 0)
+            {
+                return Result.Failure<IList<TopUpOptionsDto>>(TopUpOptionsErrors.NoOptionsFound());
+            }
+
            var result =  _mapper.Map<IList<TopUpOptionsDto>>(topUpOptions.ToList());
             return Result.Success(result);
         }
+
+
     }
 }

@@ -28,13 +28,21 @@ namespace TopUpBeneficiary.Application.Services.Beneficiaries
                 return Result.Failure(UserErrors.NotFoundById());
             }
 
-            //get users beneficiaries
             var beneficiaries = await _beneficiaryRepository.GetActiveBeneficiariesByUserId(UserId.Create(request.UserId));
             if (beneficiaries.Count() >= 5)//TODO: add to config
             {
                 return Result.Failure(BeneficiaryErrors.CountLimitReached());
             }
 
+            if (beneficiaries.Any(b => b.NickName == request.NickName))
+            {
+                return Result.Failure(BeneficiaryErrors.DuplicateNickName());
+            }
+
+            if (beneficiaries.Any(b => b.PhoneNumber == request.PhoneNumber))
+            {
+                return Result.Failure(BeneficiaryErrors.DuplicatePhoneNumber());
+            }
             _beneficiaryRepository.Add(Beneficiary.Create(UserId.Create(request.UserId), request.PhoneNumber, request.NickName));
             await _unitOfWork.Save();
 
@@ -52,7 +60,10 @@ namespace TopUpBeneficiary.Application.Services.Beneficiaries
             var beneficiaries = await _beneficiaryRepository.GetActiveBeneficiariesByUserId(UserId.Create(userId));
 
             var userBeneficiaries = _mapper.Map<IList<BeneficiaryDto>?>(beneficiaries.ToList());
-
+            if(userBeneficiaries is null)
+            {
+                throw new Exception();
+            }
             return Result.Success(userBeneficiaries);
         }
     }

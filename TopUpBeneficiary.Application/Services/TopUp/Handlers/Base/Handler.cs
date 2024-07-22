@@ -15,11 +15,11 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Base
             return handler;
         }
 
-        public virtual async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount)
+        public virtual async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount, int charge)
         {
             if (_nextHandler != null)
             {
-                return await _nextHandler.HandleAsync(user, beneficiary, topUpAmount);
+                return await _nextHandler.HandleAsync(user, beneficiary, topUpAmount, charge);
             }
 
             else

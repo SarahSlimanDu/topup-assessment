@@ -44,5 +44,11 @@ namespace TopUpBeneficiary.Domain.TopUpTransactionAggregate
                        DateTime.UtcNow);
 
         }
+
+        public void UpdateStatus(string  status)
+        {
+            this.Status = status;   
+            this.UpdatedDateTime = DateTime.UtcNow; 
+        }
     }
 }

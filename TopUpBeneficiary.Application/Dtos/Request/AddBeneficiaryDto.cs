@@ -8,7 +8,7 @@ namespace TopUpBeneficiary.Application.Dtos.Request
         public Guid UserId { get;  set; }
 
         [Required]
-        [MaxLength(20)]
+        [MaxLength(10)]
         public string PhoneNumber { get;  set; }
 
         [Required]

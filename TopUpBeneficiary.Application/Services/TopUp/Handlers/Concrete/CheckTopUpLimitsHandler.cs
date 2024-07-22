@@ -15,7 +15,7 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
             _topUpRepository = topUpRepository;
         }
 
-        public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount)
+        public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount, int charge)
         {
             var sumTopUpAmount = await _topUpRepository.SumTopUpsInCurrentMonthForUserPerBeneficiary(user.Id, beneficiary.Id);
             var sumTopUpForUserBeneficiaries = await _topUpRepository.SumTopUpsTnCurrentMonthForUserBeneficiaries(user.Id);
@@ -31,7 +31,7 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
             }
             else
             {
-                return await base.HandleAsync(user, beneficiary, topUpAmount);
+                return await base.HandleAsync(user, beneficiary, topUpAmount, charge);
             }
         }
     }

@@ -13,5 +13,11 @@ namespace TopUpBeneficiary.Domain.Errors
 
         public static Error CountLimitReached() => new(
             "Beneficiary.CountLimitReached", "User have reached the limit of active beneficiaries", ErrorTypes.Conflict);
+
+        public static Error DuplicateNickName() => new(
+            "Beneficiary.DuplicateNickName", "User already has beneficiary with same nick name", ErrorTypes.Conflict);
+
+        public static Error DuplicatePhoneNumber() => new(
+            "Beneficiary.DuplicatePhoneNumber", "User already has beneficiary with same phone number", ErrorTypes.Conflict);
     }
 }

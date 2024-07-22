@@ -1,4 +1,5 @@
-﻿using TopUpBeneficiary.Domain.Commons.Model;
+﻿using TopUpBeneficiary.Domain.BeneficiaryAggregate;
+using TopUpBeneficiary.Domain.Commons.Model;
 using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
 
 namespace TopUpBeneficiary.Domain.UserAggregate

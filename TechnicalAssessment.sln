@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopUpBeneficiary.Api", "TopUpBeneficiary.Api\TopUpBeneficiary.Api.csproj", "{64842FB6-6744-4C98-938C-D8C8C51A255A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopUpBeneficiary.UnitTests", "TopUpBeneficiary.UnitTests\TopUpBeneficiary.UnitTests.csproj", "{4CD34813-EAEA-4CBD-8E43-AE0634B69CC6}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{48CA4507-4EF9-460D-9D4D-0E303AEE4C43}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TopUpMicroService", "TopUpMicroService", "{B8FD55C9-BEA3-461F-9D7C-109706EA0F5A}"
@@ -31,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accounts.Infrastructure", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{611C0842-A2D9-40E4-8AF6-C48E398EDC24}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.UnitTests", "Services.UnitTests\Services.UnitTests.csproj", "{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,10 +41,6 @@ Global
 		{64842FB6-6744-4C98-938C-D8C8C51A255A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64842FB6-6744-4C98-938C-D8C8C51A255A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64842FB6-6744-4C98-938C-D8C8C51A255A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4CD34813-EAEA-4CBD-8E43-AE0634B69CC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4CD34813-EAEA-4CBD-8E43-AE0634B69CC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4CD34813-EAEA-4CBD-8E43-AE0634B69CC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4CD34813-EAEA-4CBD-8E43-AE0634B69CC6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C974356D-1C75-4F40-9438-FD0A8FE319DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C974356D-1C75-4F40-9438-FD0A8FE319DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C974356D-1C75-4F40-9438-FD0A8FE319DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -77,6 +73,10 @@ Global
 		{DD623BCF-BBD3-4BA0-8E55-CB3B44E0E431}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD623BCF-BBD3-4BA0-8E55-CB3B44E0E431}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD623BCF-BBD3-4BA0-8E55-CB3B44E0E431}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,6 +93,7 @@ Global
 		{7E00D6D8-FEAC-4F6C-A57B-F9ED39FF8A09} = {B78AAC90-3D06-4A1C-870C-A58E3852B676}
 		{944EBCE8-C823-4A33-ABA2-788E7025FDBA} = {48CA4507-4EF9-460D-9D4D-0E303AEE4C43}
 		{DD623BCF-BBD3-4BA0-8E55-CB3B44E0E431} = {B78AAC90-3D06-4A1C-870C-A58E3852B676}
+		{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA} = {611C0842-A2D9-40E4-8AF6-C48E398EDC24}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {01513B44-3B5F-4939-9ECD-867B8CF0D912}
