@@ -1,16 +1,13 @@
-﻿using FluentAssertions;
-using MapsterMapper;
-using Moq;
-using TopUpBeneficiary.Application.Dtos.Response;
+﻿using TopUpBeneficiary.Application.Dtos.Response;
 using TopUpBeneficiary.Application.Services.Beneficiaries;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate;
-using TopUpBeneficiary.Domain.Errors;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Commons;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
 using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
 using TopUpBeneficiary.Domain.UserAggregate;
+using TopUpBeneficiaryService.UnitTests.Fixtures;
 
-namespace Services.UnitTests.Beneficiaries
+namespace TopUpBeneficiaryService.UnitTests.Beneficiaries
 {
     public class GetBeneficiaryTests
     {
@@ -53,8 +50,7 @@ namespace Services.UnitTests.Beneficiaries
         public async Task GetBeneficiaries_ShouldReturnEmptyList_WhenUserHasNoBeneficiaries()
         {
             // Arrange
-            var user = User.Create("test@test.com", true, AccountId.Create(Guid.NewGuid()));
-
+            var user = UserFixtures.User;
             _userRepositoryMock.Setup(repo => repo.GetById(It.IsAny<UserId>())).ReturnsAsync(user);
             _beneficiaryRepositoryMock.Setup(repo => repo.GetActiveBeneficiariesByUserId(It.IsAny<UserId>())).ReturnsAsync(new List<Beneficiary>());
 
@@ -70,21 +66,11 @@ namespace Services.UnitTests.Beneficiaries
         public async Task GetBeneficiaries_ShouldReturnBeneficiaries_WhenUserHasBeneficiaries()
         {
             // Arrange
-            var user = User.Create("test@test.com", true, AccountId.Create(Guid.NewGuid()));
-            var beneficiaries = new List<Beneficiary>
-        {
-            Beneficiary.Create(user.Id,"1234567890", "Nick1" ),
-             Beneficiary.Create(user.Id, "0987654321", "Nick2" )
-        };
-            var beneficiaryDtos = new List<BeneficiaryDto>
-        {
-            new BeneficiaryDto { BeneficiaryId = beneficiaries[0].Id.Value, PhoneNumber = beneficiaries[0].PhoneNumber, NickName = beneficiaries[0].NickName },
-            new BeneficiaryDto { BeneficiaryId = beneficiaries[1].Id.Value, PhoneNumber = beneficiaries[1].PhoneNumber, NickName = beneficiaries[1].NickName }
-        };
-
+            var user = UserFixtures.User;
+            var beneficiaries = BeneficiaryFixtures.GetUserBeneficiaries();
             _userRepositoryMock.Setup(repo => repo.GetById(It.IsAny<UserId>())).ReturnsAsync(user);
             _beneficiaryRepositoryMock.Setup(repo => repo.GetActiveBeneficiariesByUserId(It.IsAny<UserId>())).ReturnsAsync(beneficiaries);
-            _mapperMock.Setup(mapper => mapper.Map<IList<BeneficiaryDto>>(It.IsAny<IList<Beneficiary>>())).Returns(beneficiaryDtos);
+            _mapperMock.Setup(mapper => mapper.Map<IList<BeneficiaryDto>>(It.IsAny<IList<Beneficiary>>())).Returns(BeneficiaryFixtures.GetBeneficiaryDtos(beneficiaries));
 
             // Act
             var result = await _beneficiaryService.GetBeneficiaries(user.Id.Value);
@@ -93,7 +79,7 @@ namespace Services.UnitTests.Beneficiaries
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().NotBeNull();
             result.Value.Should().HaveCount(2);
-            result.Value.Should().BeEquivalentTo(beneficiaryDtos);
+            result.Value.Should().BeEquivalentTo(BeneficiaryFixtures.GetBeneficiaryDtos(beneficiaries));
         }
     }
 }

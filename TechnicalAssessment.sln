@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accounts.Infrastructure", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{611C0842-A2D9-40E4-8AF6-C48E398EDC24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.UnitTests", "Services.UnitTests\Services.UnitTests.csproj", "{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopUpBeneficiaryService.UnitTests", "Services.UnitTests\TopUpBeneficiaryService.UnitTests.csproj", "{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

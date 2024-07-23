@@ -27,9 +27,14 @@ namespace Accounts.Application.Services
             {
                 return Result.Failure<GetBalanceResponse>(AccountErrors.NotFoundById());
             }
-            _transactionRepository.Add(Transaction.Create(AccountId.Create(request.AccountId),TransactionType.Debit.ToString(), request.Amount));
+
+            if(account.Balance < request.DebitAmount)
+            {
+                return Result.Failure<GetBalanceResponse>(AccountErrors.NoEnoughBalance());
+            }
+            _transactionRepository.Add(Transaction.Create(AccountId.Create(request.AccountId),TransactionType.Debit.ToString(), request.DebitAmount));
          
-            account.DebitBalance(request.Amount);
+            account.DebitBalance(request.DebitAmount);
 
             _accountRepository.UpdateAccount(account);
 

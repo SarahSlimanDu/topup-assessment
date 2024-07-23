@@ -24,13 +24,13 @@ namespace TopUpBeneficiary.Domain.BeneficiaryAggregate
             UpdatedDateTime = updatedDateTime;
         }
 
-        public static Beneficiary Create(UserId userId, string phoneNumber, string nickName)
+        public static Beneficiary Create(UserId userId, string phoneNumber, string nickName, bool isActive)
         {
             return new(BeneficiaryId.CreateUnique(),
                         userId,
                         phoneNumber,
                         nickName,
-                        true,
+                        isActive,
                         DateTime.UtcNow,
                         DateTime.UtcNow);
         }

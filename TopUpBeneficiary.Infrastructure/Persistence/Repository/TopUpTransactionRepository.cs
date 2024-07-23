@@ -14,7 +14,7 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Repository
         {
         }
 
-        public async Task<int> SumTopUpsInCurrentMonthForUserPerBeneficiary(UserId userId, BeneficiaryId beneficiaryId)
+        public async Task<int> SumTopUpsInCurrentMonthPerBeneficiary(UserId userId, BeneficiaryId beneficiaryId)
         {
             return await _context.Set<TopUpTransaction>().Where(t => t.UserId == userId
                                                                   && t.BeneficiaryId == beneficiaryId
@@ -24,7 +24,7 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Repository
                                                          .SumAsync(t => t.TopUpOption.Amount);
         }
 
-        public async Task<int> SumTopUpsTnCurrentMonthForUserBeneficiaries(UserId userId)
+        public async Task<int> SumTopUpsInCurrentMonthForAllBeneficiaries(UserId userId)
         {
            return await _context.Set<TopUpTransaction>().Where(t => t.UserId == userId
                                                                  && t.Status == TopUpTransactionStatus.Success.ToString()

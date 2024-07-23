@@ -7,7 +7,7 @@ namespace TopUpBeneficiary.Domain.Persistence.Interfaces.Repository
 {
     public interface ITopUpTransactionRepository : IRepository<TopUpTransaction>
     {
-        Task<int> SumTopUpsInCurrentMonthForUserPerBeneficiary(UserId userId, BeneficiaryId beneficiaryId);
-        Task<int> SumTopUpsTnCurrentMonthForUserBeneficiaries(UserId userId);
+        Task<int> SumTopUpsInCurrentMonthPerBeneficiary(UserId userId, BeneficiaryId beneficiaryId);
+        Task<int> SumTopUpsInCurrentMonthForAllBeneficiaries(UserId userId);
     }
 }   

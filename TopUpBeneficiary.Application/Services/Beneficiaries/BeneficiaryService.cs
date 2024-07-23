@@ -43,7 +43,7 @@ namespace TopUpBeneficiary.Application.Services.Beneficiaries
             {
                 return Result.Failure(BeneficiaryErrors.DuplicatePhoneNumber());
             }
-            _beneficiaryRepository.Add(Beneficiary.Create(UserId.Create(request.UserId), request.PhoneNumber, request.NickName));
+            _beneficiaryRepository.Add(Beneficiary.Create(UserId.Create(request.UserId), request.PhoneNumber, request.NickName, true));
             await _unitOfWork.Save();
 
             return Result.Success();
@@ -60,10 +60,6 @@ namespace TopUpBeneficiary.Application.Services.Beneficiaries
             var beneficiaries = await _beneficiaryRepository.GetActiveBeneficiariesByUserId(UserId.Create(userId));
 
             var userBeneficiaries = _mapper.Map<IList<BeneficiaryDto>?>(beneficiaries.ToList());
-            if(userBeneficiaries is null)
-            {
-                throw new Exception();
-            }
             return Result.Success(userBeneficiaries);
         }
     }

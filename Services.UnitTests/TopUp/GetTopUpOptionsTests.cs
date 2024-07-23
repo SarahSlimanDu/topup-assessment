@@ -1,16 +1,13 @@
-﻿using FluentAssertions;
-using MapsterMapper;
-using Moq;
-using TopUpBeneficiary.Application.Dtos.Response;
+﻿using TopUpBeneficiary.Application.Dtos.Response;
 using TopUpBeneficiary.Application.Services.TopUp;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Interface;
 using TopUpBeneficiary.Application.SyncDataService.WebService.Client;
-using TopUpBeneficiary.Domain.Errors;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Commons;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
 using TopUpBeneficiary.Domain.TopUpOptionsAggregate;
+using TopUpBeneficiaryService.UnitTests.Fixtures;
 
-namespace Services.UnitTests.TopUp
+namespace TopUpBeneficiaryService.UnitTests.TopUp
 {
     public class GetTopUpOptionsTests
     {
@@ -64,19 +61,9 @@ namespace Services.UnitTests.TopUp
         public async Task GetTopUpOptions_ShouldReturnOptions_WhenOptionsExist()
         {
             // Arrange
-            var topUpOptions = new List<TopUpOption>
-            {
-                TopUpOption.Create(10),
-                TopUpOption.Create(20)
-            };
-            var topUpOptionsDto = new List<TopUpOptionsDto>
-        {
-            new TopUpOptionsDto { Id = topUpOptions[0].Id.Value, Amount = topUpOptions[0].Amount, CreatedDateTime = topUpOptions[0].CreatedDateTime },
-            new TopUpOptionsDto { Id = topUpOptions[1].Id.Value, Amount = topUpOptions[1].Amount, CreatedDateTime = topUpOptions[1].CreatedDateTime}
-        };
-
+            var topUpOptions = TopUpOptionsFixtures.GetTopUpOptions();
             _topUpOptionsRepositoryMock.Setup(repo => repo.GetAll()).ReturnsAsync(topUpOptions);
-            _mapperMock.Setup(mapper => mapper.Map<IList<TopUpOptionsDto>>(It.IsAny<IList<TopUpOption>>())).Returns(topUpOptionsDto);
+            _mapperMock.Setup(mapper => mapper.Map<IList<TopUpOptionsDto>>(It.IsAny<IList<TopUpOption>>())).Returns(TopUpOptionsFixtures.GetTopUpOptionsDtos(topUpOptions));
 
             // Act
             var result = await _topUpService.GetTopUpOptions();
@@ -85,7 +72,7 @@ namespace Services.UnitTests.TopUp
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().NotBeNull();
             result.Value.Should().HaveCount(2);
-            result.Value.Should().BeEquivalentTo(topUpOptionsDto);
+            result.Value.Should().BeEquivalentTo(TopUpOptionsFixtures.GetTopUpOptionsDtos(topUpOptions));
         }
     }
 }

@@ -17,10 +17,10 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
 
         public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount, int charge)
         {
-            var sumTopUpAmount = await _topUpRepository.SumTopUpsInCurrentMonthForUserPerBeneficiary(user.Id, beneficiary.Id);
-            var sumTopUpForUserBeneficiaries = await _topUpRepository.SumTopUpsTnCurrentMonthForUserBeneficiaries(user.Id);
+            var sumTopUpAmount = await _topUpRepository.SumTopUpsInCurrentMonthPerBeneficiary(user.Id, beneficiary.Id);
+            var sumTopUpForUserBeneficiaries = await _topUpRepository.SumTopUpsInCurrentMonthForAllBeneficiaries(user.Id);
 
-            if (user.IsVerified && sumTopUpAmount >= 1000 || !user.IsVerified && sumTopUpAmount >= 500) //TODO: this shouldn't be hard coded
+            if (user.IsVerified && sumTopUpAmount >= 500 || !user.IsVerified && sumTopUpAmount >= 1000)
             {
 
                 return Result.Failure(TopUpTransactionErrors.ExceedBeneficiaryLimit());

@@ -1,14 +1,9 @@
-﻿using MapsterMapper;
-using Moq;
-using TopUpBeneficiary.Application.Dtos.Request;
+﻿using TopUpBeneficiary.Application.Dtos.Request;
 using TopUpBeneficiary.Application.Services.Beneficiaries;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Commons;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
-using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
 using TopUpBeneficiary.Domain.UserAggregate;
-using FluentAssertions;
-using TopUpBeneficiary.Domain.Errors;
-using TopUpBeneficiary.Domain.BeneficiaryAggregate;
+using TopUpBeneficiaryService.UnitTests.Fixtures;
 
 namespace Services.UnitTests.Beneficiaries
 {
@@ -38,19 +33,10 @@ namespace Services.UnitTests.Beneficiaries
         public async Task AddBeneficiary_ShouldReturnError_WhenUserHasFiveActiveBeneficiaries()
         {
             // Arrange
-            var user = User.Create("test@test.com", true, AccountId.Create(Guid.NewGuid()));
-            var request = new AddBeneficiaryDto { UserId = user.Id.Value, PhoneNumber = "1234567890", NickName = "TestNick" };
-            var beneficiaries = new List<Beneficiary>
-            {
-             Beneficiary.Create( user.Id, "123", "Nick1" ),
-             Beneficiary.Create( user.Id, "124", "Nick2"  ),
-             Beneficiary.Create( user.Id, "125", "Nick3" ),
-             Beneficiary.Create( user.Id, "126", "Nick4" ),
-             Beneficiary.Create( user.Id, "127", "Nick5" )
-            };
+            var request = new AddBeneficiaryDto { UserId = UserFixtures.User.Id.Value, PhoneNumber = "1234567890", NickName = "TestNick" };
 
-            _userRepositoryMock.Setup(repo => repo.GetById(user.Id)).ReturnsAsync(user);
-            _beneficiaryRepositoryMock.Setup(repo => repo.GetActiveBeneficiariesByUserId(user.Id)).ReturnsAsync(beneficiaries);
+            _userRepositoryMock.Setup(repo => repo.GetById(UserFixtures.User.Id)).ReturnsAsync(UserFixtures.User);
+            _beneficiaryRepositoryMock.Setup(repo => repo.GetActiveBeneficiariesByUserId(UserFixtures.User.Id)).ReturnsAsync(BeneficiaryFixtures.GetBeneficiaries());
 
             // Act
             var result = await _beneficiaryService.AddBeneficiary(request);
@@ -64,10 +50,9 @@ namespace Services.UnitTests.Beneficiaries
         public async Task AddBeneficiary_ShouldReturnError_WhenUserDoesNotExist()
         {
             // Arrange
-            var userId = UserId.Create(Guid.NewGuid());
-            var request = new AddBeneficiaryDto { UserId = userId.Value, PhoneNumber = "1234567890", NickName = "TestNick" };
+            var request = new AddBeneficiaryDto { UserId = UserFixtures.User.Id.Value, PhoneNumber = "1234567890", NickName = "TestNick" };
 
-            _userRepositoryMock.Setup(repo => repo.GetById(userId)).ReturnsAsync((User)null);
+            _userRepositoryMock.Setup(repo => repo.GetById(UserFixtures.User.Id)).ReturnsAsync((User)null);
 
             // Act
             var result = await _beneficiaryService.AddBeneficiary(request);
@@ -81,16 +66,9 @@ namespace Services.UnitTests.Beneficiaries
         public async Task AddBeneficiary_ShouldReturnError_WhenDuplicateNickName()
         {
             // Arrange
-            var user = User.Create("test@test.com", true, AccountId.Create(Guid.NewGuid()));
-            var request = new AddBeneficiaryDto { UserId = user.Id.Value, PhoneNumber = "1234567890", NickName = "DuplicateNick" };
-
-            var beneficiaries = new List<Beneficiary>
-            {
-             Beneficiary.Create(user.Id, "123",  "DuplicateNick")
-            };
-
-            _userRepositoryMock.Setup(repo => repo.GetById(user.Id)).ReturnsAsync(user);
-            _beneficiaryRepositoryMock.Setup(repo => repo.GetActiveBeneficiariesByUserId(user.Id)).ReturnsAsync(beneficiaries);
+            var request = new AddBeneficiaryDto { UserId = UserFixtures.User.Id.Value, PhoneNumber = "1234567890", NickName = "DuplicateNick" };
+            _userRepositoryMock.Setup(repo => repo.GetById(UserFixtures.User.Id)).ReturnsAsync(UserFixtures.User);
+            _beneficiaryRepositoryMock.Setup(repo => repo.GetActiveBeneficiariesByUserId(UserFixtures.User.Id)).ReturnsAsync(BeneficiaryFixtures.GetBeneficiaryWithSameNickName());
 
             // Act
             var result = await _beneficiaryService.AddBeneficiary(request);
@@ -104,16 +82,9 @@ namespace Services.UnitTests.Beneficiaries
         public async Task AddBeneficiary_ShouldReturnError_WhenDuplicatePhoneNumber()
         {
             // Arrange
-            var user = User.Create("test@test.com", true, AccountId.Create(Guid.NewGuid()));
-            var request = new AddBeneficiaryDto { UserId = user.Id.Value, PhoneNumber = "123", NickName = "Nick1" };
-
-            var beneficiaries = new List<Beneficiary>
-            {
-             Beneficiary.Create(user.Id, "123",  "Nick2")
-            };
-
-            _userRepositoryMock.Setup(repo => repo.GetById(user.Id)).ReturnsAsync(user);
-            _beneficiaryRepositoryMock.Setup(repo => repo.GetActiveBeneficiariesByUserId(user.Id)).ReturnsAsync(beneficiaries);
+            var request = new AddBeneficiaryDto { UserId = UserFixtures.User.Id.Value, PhoneNumber = "123456", NickName = "Nick1" };
+            _userRepositoryMock.Setup(repo => repo.GetById(UserFixtures.User.Id)).ReturnsAsync(UserFixtures.User);
+            _beneficiaryRepositoryMock.Setup(repo => repo.GetActiveBeneficiariesByUserId(UserFixtures.User.Id)).ReturnsAsync(BeneficiaryFixtures.GetBeneficiaryWithSamePhoneNumber());
 
             // Act
             var result = await _beneficiaryService.AddBeneficiary(request);

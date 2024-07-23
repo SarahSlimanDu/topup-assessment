@@ -53,7 +53,6 @@ namespace TopUpBeneficiary.Application.Services.TopUp
 
         public async Task<Result> TopUpBeneficiary(TopUpDto topUpRequest)
         {
-            //test
             var topUpOption = await _topUpOptionsRepository.GetById(TopUpOptionId.Create(topUpRequest.topUpOptionId));
             if (topUpOption is null)
                 return Result.Failure(TopUpOptionsErrors.NotFoundById());
@@ -85,7 +84,7 @@ namespace TopUpBeneficiary.Application.Services.TopUp
             }
             else
             {
-                topUpTransaction.UpdateStatus(TopUpTransactionStatus.Success.ToString());
+                topUpTransaction.UpdateStatus(TopUpTransactionStatus.Failed.ToString());
             }
             _topUpTransactionRepository.Update(topUpTransaction);
             await _unitOfWork.Save(); 
