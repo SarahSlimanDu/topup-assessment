@@ -19,19 +19,15 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
         {
             var result = await _accountClient.GetBalance(user.AccountId);
 
-            if (result.IsSuccess)
+            if (result.Value.Balance < topUpAmount + charge)
             {
-                if (result.Value.Balance < topUpAmount + charge)
-                {
-                    return Result.Failure(UserErrors.NoEnoughBalance());
-                }
-                else
-                {
-                    return await base.HandleAsync(user, beneficiary, topUpAmount, charge);
-                }
+                return Result.Failure(UserErrors.NoEnoughBalance());
             }
             else
-                return result.Error;
+            {
+                return await base.HandleAsync(user, beneficiary, topUpAmount, charge);
+            }
+
         }
     }
 }

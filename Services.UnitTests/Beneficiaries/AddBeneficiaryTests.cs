@@ -1,4 +1,5 @@
-﻿using TopUpBeneficiary.Application.Dtos.Request;
+﻿using System.ComponentModel.DataAnnotations;
+using TopUpBeneficiary.Application.Dtos.Request;
 using TopUpBeneficiary.Application.Services.Beneficiaries;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Commons;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
@@ -27,6 +28,41 @@ namespace Services.UnitTests.Beneficiaries
                 _unitOfWorkMock.Object,
                 _mapperMock.Object
             );
+        }
+
+        [Fact]
+        public void NickName_ShouldNotExceedMaxLength()
+        {
+            var dto = new AddBeneficiaryDto
+            {
+                UserId = Guid.NewGuid(),
+                PhoneNumber = "1234567890",
+                NickName = new string('a', 21) 
+            };
+
+            var validationContext = new ValidationContext(dto);
+            var validationResults = new List<ValidationResult>();
+
+            var isValid = Validator.TryValidateObject(dto, validationContext, validationResults, true);
+
+            isValid.Should().BeFalse();
+        }
+        [Fact]
+        public void PhoneNumber_ShouldNotExceedMaxLength()
+        {
+            var dto = new AddBeneficiaryDto
+            {
+                UserId = Guid.NewGuid(),
+                PhoneNumber = "12345678901",
+                NickName = "Nick1"
+            };
+
+            var validationContext = new ValidationContext(dto);
+            var validationResults = new List<ValidationResult>();
+
+            var isValid = Validator.TryValidateObject(dto, validationContext, validationResults, true);
+
+            isValid.Should().BeFalse();
         }
 
         [Fact]

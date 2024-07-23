@@ -1,7 +1,9 @@
-﻿using TopUpBeneficiary.Application.Dtos.Response;
+﻿using Microsoft.Extensions.Options;
+using TopUpBeneficiary.Application.Dtos.Response;
 using TopUpBeneficiary.Application.Services.TopUp;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Interface;
 using TopUpBeneficiary.Application.SyncDataService.WebService.Client;
+using TopUpBeneficiary.Domain.Commons.Constants;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Commons;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
 using TopUpBeneficiary.Domain.TopUpOptionsAggregate;
@@ -20,6 +22,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly TopUpService _topUpService;
+        private readonly Mock<IOptions<AppConstants>> _appConstantsMock;
 
         public GetTopUpOptionsTests()
         {
@@ -31,6 +34,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp
             _accountClientMock = new Mock<IAccountClient>();
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _mapperMock = new Mock<IMapper>();
+            _appConstantsMock = new Mock<IOptions<AppConstants>>();
 
             _topUpService = new TopUpService(
                 _userRepositoryMock.Object,
@@ -39,7 +43,8 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp
                 _beneficiaryRepositoryMock.Object,
                 _accountClientMock.Object,
                 _unitOfWorkMock.Object,
-                _mapperMock.Object
+                _mapperMock.Object,
+                 _appConstantsMock.Object
             );
         }
 

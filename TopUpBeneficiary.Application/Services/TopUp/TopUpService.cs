@@ -1,11 +1,13 @@
 ﻿using Commons.Errors;
 using MapsterMapper;
+using Microsoft.Extensions.Options;
 using TopUpBeneficiary.Application.Dtos.Request;
 using TopUpBeneficiary.Application.Dtos.Response;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Interface;
 using TopUpBeneficiary.Application.SyncDataService.WebService.Client;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate.ValueObjects;
+using TopUpBeneficiary.Domain.Commons.Constants;
 using TopUpBeneficiary.Domain.Commons.Enums;
 using TopUpBeneficiary.Domain.Errors;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Commons;
@@ -26,6 +28,7 @@ namespace TopUpBeneficiary.Application.Services.TopUp
         private readonly IAccountClient _accountClient;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly AppConstants _appConstants;
 
         public TopUpService(IUserRepository userRepository,
                             ITopUpOptionsRepository topUpOptionsRepository,
@@ -33,7 +36,8 @@ namespace TopUpBeneficiary.Application.Services.TopUp
                             IBeneficiaryRepository beneficiaryRepository,
                             IAccountClient accountClient,
                             IUnitOfWork unitOfWork,
-                            IMapper mapper)
+                            IMapper mapper,
+                            IOptions<AppConstants> constants)
         {
             _userRepository = userRepository;
             _topUpOptionsRepository = topUpOptionsRepository;
@@ -42,10 +46,11 @@ namespace TopUpBeneficiary.Application.Services.TopUp
             _accountClient = accountClient;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _appConstants = constants.Value;
 
             //build the chain
             var firstHandler = new CheckBeneficiaryStatusHandler();
-            firstHandler.SetNext(new CheckTopUpLimitsHandler(_topUpTransactionRepository))
+            firstHandler.SetNext(new CheckTopUpLimitsHandler(_topUpTransactionRepository, constants))
                         .SetNext(new CheckUserBalanceHandler(_accountClient))
                         .SetNext(new DebitUserBalanceHandler(_accountClient));
             _handler = firstHandler;
@@ -57,26 +62,24 @@ namespace TopUpBeneficiary.Application.Services.TopUp
             if (topUpOption is null)
                 return Result.Failure(TopUpOptionsErrors.NotFoundById());
 
-            //test
             var user = await _userRepository.GetById(UserId.Create(topUpRequest.UserId));
             if (user is null)
                 return Result.Failure(UserErrors.NotFoundById());
 
-            //test
             var beneficiary = await _beneficiaryRepository.GetById(BeneficiaryId.Create(topUpRequest.BeneficiaryId));
             if (beneficiary is null)
                 return Result.Failure(BeneficiaryErrors.NotFoundById());
 
-            //insert row in top up transaction with initial status
-            var topUpTransaction = _topUpTransactionRepository.Add(TopUpTransaction
-                                       .Create(user.Id, beneficiary.Id, topUpOption.Id, 1, TopUpTransactionStatus.Pending.ToString()));
+            var topUpTransaction = _topUpTransactionRepository
+                                  .Add(TopUpTransaction
+                                  .Create(user.Id, beneficiary.Id, topUpOption.Id, _appConstants.Charge, TopUpTransactionStatus.Pending.ToString()));
             await _unitOfWork.Save();
 
 
             var chainResult = await _handler.HandleAsync(user,
                                              beneficiary,
                                              topUpOption.Amount,
-                                             1);//TODO: change this
+                                             _appConstants.Charge);
 
             if (chainResult.IsSuccess)
             {

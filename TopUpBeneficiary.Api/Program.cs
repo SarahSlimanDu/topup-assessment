@@ -2,6 +2,7 @@ using TopUpBeneficiary.Api;
 using TopUpBeneficiary.Api.Commons.MappingConfig;
 using TopUpBeneficiary.Api.Extension;
 using TopUpBeneficiary.Application;
+using TopUpBeneficiary.Domain.Commons.Constants;
 using TopUpBeneficiary.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddApplication(builder.Configuration)
 builder.Services.AddControllers();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.Configure<AppConstants>(builder.Configuration.GetSection(nameof(AppConstants)));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

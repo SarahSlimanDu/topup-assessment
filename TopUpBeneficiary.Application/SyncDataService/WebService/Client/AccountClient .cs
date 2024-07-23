@@ -2,11 +2,9 @@
 using Commons.HttpRequestBuild;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.ComponentModel.Design;
 using TopUpBeneficiary.Application.Dtos.Request;
 using TopUpBeneficiary.Application.SyncDataService.WebService.Response;
 using TopUpBeneficiary.Application.SyncDataService.WebService.Settings;
-using TopUpBeneficiary.Domain.Errors;
 using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
 
 namespace TopUpBeneficiary.Application.SyncDataService.WebService.Client
@@ -26,24 +24,18 @@ namespace TopUpBeneficiary.Application.SyncDataService.WebService.Client
                 _settings.Endpoints.GetBalance.Replace("{accountId}", accountId.Value.ToString()), HttpMethod.Get).Build();
 
             var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+       
             var content = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
-            {
 
-                var balanceResponse = JsonConvert.DeserializeObject<GetBalanceResponse>(content);
-                if (balanceResponse != null)
-                    return Result.Success(balanceResponse);
-                else
-                    throw new Exception("Something went wrong");//TODO : re-check
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                throw new InvalidOperationException($"Received an empty response from the external service {nameof(GetBalance)}.");
             }
             else
             {
-                var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(content);
-
-                if (errorResponse != null && errorResponse.StatusCode == ErrorTypes.NotFound.ToString())
-                    return Result.Failure<GetBalanceResponse>(UserErrors.AccountNotFound());
-                else
-                    throw new Exception("Something went wrong");//TODO: check
+                var balanceResponse = JsonConvert.DeserializeObject<GetBalanceResponse>(content);
+                return Result.Success(balanceResponse);
             }
         }
 
@@ -54,14 +46,9 @@ namespace TopUpBeneficiary.Application.SyncDataService.WebService.Client
                 _settings.Endpoints.DebitBalance, HttpMethod.Post).SetRequestBody(body).Build();
 
             var response = await _httpClient.SendAsync(request);
-            if(response.IsSuccessStatusCode)
-            {
-                return Result.Success();
-            }
-            else
-            {
-                throw new Exception("Some thing went wrong");//TODO: change
-            }
+            response.EnsureSuccessStatusCode();
+
+            return Result.Success();
         }
     }
 }

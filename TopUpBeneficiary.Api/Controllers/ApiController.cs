@@ -24,11 +24,10 @@ namespace TopUpBeneficiary.Api.Controllers
                 _ => StatusCodes.Status500InternalServerError,
             };
 
-            //TODO: check this response more
             return Problem(
                 statusCode: statusCode,
                 title: result.Error.Code,
-                type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                detail: result.Error.Description
                 );
         }
     }

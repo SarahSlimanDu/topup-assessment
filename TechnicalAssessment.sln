@@ -31,6 +31,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{611C0842
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopUpBeneficiaryService.UnitTests", "Services.UnitTests\TopUpBeneficiaryService.UnitTests.csproj", "{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountsService.UnitTests", "AccountsService.UnitTests\AccountsService.UnitTests.csproj", "{B0C26A9B-7CB4-4043-BF7F-7E657D62F590}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0C26A9B-7CB4-4043-BF7F-7E657D62F590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0C26A9B-7CB4-4043-BF7F-7E657D62F590}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0C26A9B-7CB4-4043-BF7F-7E657D62F590}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0C26A9B-7CB4-4043-BF7F-7E657D62F590}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +100,7 @@ Global
 		{944EBCE8-C823-4A33-ABA2-788E7025FDBA} = {48CA4507-4EF9-460D-9D4D-0E303AEE4C43}
 		{DD623BCF-BBD3-4BA0-8E55-CB3B44E0E431} = {B78AAC90-3D06-4A1C-870C-A58E3852B676}
 		{4C0B9820-AFD3-46F9-9010-DDBEECB23EBA} = {611C0842-A2D9-40E4-8AF6-C48E398EDC24}
+		{B0C26A9B-7CB4-4043-BF7F-7E657D62F590} = {611C0842-A2D9-40E4-8AF6-C48E398EDC24}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {01513B44-3B5F-4939-9ECD-867B8CF0D912}

@@ -16,6 +16,8 @@ using TopUpBeneficiary.Application.SyncDataService.WebService.Response;
 using TopUpBeneficiary.Domain.Commons.Enums;
 using TopUpBeneficiary.Domain.TopUpTransactionAggregate;
 using TopUpBeneficiary.Domain.UserAggregate;
+using Microsoft.Extensions.Options;
+using TopUpBeneficiary.Domain.Commons.Constants;
 
 namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService
 {
@@ -30,7 +32,8 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly TopUpService _topUpService;
-
+        private readonly Mock<IOptions<AppConstants>> _appConstantsMock;
+        private readonly AppConstants _appConstants;
         public TopUpBeneficiaryTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
@@ -40,8 +43,17 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService
             _accountClientMock = new Mock<IAccountClient>();
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _mapperMock = new Mock<IMapper>();
-            _handlerMock = new Mock<IHandler>();    
+            _handlerMock = new Mock<IHandler>();
+            _appConstantsMock = new Mock<IOptions<AppConstants>>();
+            _appConstants = new AppConstants
+            {
+                MonthlyLimit = 3000,
+                MonthlyLimitPerBeneficiary_UnVerifiedUser = 1000,
+                MonthlyLimitPerBeneficiary_VerifiedUser = 500,
+                Charge = 1
+            };
 
+            _appConstantsMock.Setup(a => a.Value).Returns(_appConstants);
             _topUpService = new TopUpService(
                 _userRepositoryMock.Object,
                 _topUpOptionsRepositoryMock.Object,
@@ -49,12 +61,14 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService
                 _beneficiaryRepositoryMock.Object,
                 _accountClientMock.Object,
                 _unitOfWorkMock.Object,
-                _mapperMock.Object
+                _mapperMock.Object,
+                _appConstantsMock.Object
             );
 
+            
             //build the chain
             var firstHandler = new CheckBeneficiaryStatusHandler();
-            firstHandler.SetNext(new CheckTopUpLimitsHandler(_topUpTransactionRepositoryMock.Object))
+            firstHandler.SetNext(new CheckTopUpLimitsHandler(_topUpTransactionRepositoryMock.Object, _appConstantsMock.Object))
                         .SetNext(new CheckUserBalanceHandler(_accountClientMock.Object))
                         .SetNext(new DebitUserBalanceHandler(_accountClientMock.Object));
            // _handlerMock = firstHandler;
@@ -117,7 +131,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService
             _topUpTransactionRepositoryMock.Setup(repo => repo.Add(It.IsAny<TopUpTransaction>())).Returns(TopUpBeneficiaryFixtures.TopUpTransaction);
             _unitOfWorkMock.Setup(uow => uow.Save()).Returns(Task.CompletedTask);
             // Mock the handler chain to return success
-            _handlerMock.Setup(handler => handler.HandleAsync(UserFixtures.User, BeneficiaryFixtures.ActiveBeneficiary, TopUpOptionsFixtures.TopUpOption.Amount, 1))
+            _handlerMock.Setup(handler => handler.HandleAsync(UserFixtures.User, BeneficiaryFixtures.ActiveBeneficiary, TopUpOptionsFixtures.TopUpOption.Amount, _appConstants.Charge))
                         .ReturnsAsync(Result.Success());
 
             // Act
@@ -143,7 +157,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService
             _topUpTransactionRepositoryMock.Setup(repo => repo.Add(It.IsAny<TopUpTransaction>())).Returns(TopUpBeneficiaryFixtures.TopUpTransaction);
             _unitOfWorkMock.Setup(uow => uow.Save()).Returns(Task.CompletedTask);
             // Mock the handler chain to return success
-            _handlerMock.Setup(handler => handler.HandleAsync(UserFixtures.User, BeneficiaryFixtures.ActiveBeneficiary, TopUpOptionsFixtures.TopUpOption.Amount, 1))
+            _handlerMock.Setup(handler => handler.HandleAsync(UserFixtures.User, BeneficiaryFixtures.ActiveBeneficiary, TopUpOptionsFixtures.TopUpOption.Amount, _appConstants.Charge))
                         .ReturnsAsync(Result.Failure(UserErrors.NoEnoughBalance()));
 
             // Act

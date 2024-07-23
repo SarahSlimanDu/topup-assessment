@@ -3,6 +3,9 @@ using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
 using Commons.Errors;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Base;
 using TopUpBeneficiaryService.UnitTests.Fixtures;
+using Microsoft.Extensions.Options;
+using TopUpBeneficiary.Domain.Commons.Constants;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.HandlersTests
 {
@@ -10,11 +13,24 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
     {
         private readonly Mock<ITopUpTransactionRepository> _topUpTransactionRepositoryMock;
         private readonly CheckTopUpLimitsHandler _handler;
+        private readonly Mock<IOptions<AppConstants>> _appConstantsMock;
+        private readonly AppConstants _appConstants;
 
         public CheckTopUpLimitsHandlerTests()
         {
             _topUpTransactionRepositoryMock = new Mock<ITopUpTransactionRepository>();
-            _handler = new CheckTopUpLimitsHandler(_topUpTransactionRepositoryMock.Object);
+            _appConstantsMock = new Mock<IOptions<AppConstants>>();
+
+            _appConstants = new AppConstants
+            {
+                MonthlyLimit = 3000,
+                MonthlyLimitPerBeneficiary_UnVerifiedUser = 1000,
+                MonthlyLimitPerBeneficiary_VerifiedUser = 500,
+                Charge = 1
+            };
+            _appConstantsMock.Setup(a => a.Value).Returns(_appConstants);
+            _handler = new CheckTopUpLimitsHandler(_topUpTransactionRepositoryMock.Object, _appConstantsMock.Object);
+            
         }
 
         [Fact]
@@ -27,7 +43,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
             int charge = 1;
 
             _topUpTransactionRepositoryMock.Setup(repo => repo.SumTopUpsInCurrentMonthPerBeneficiary(user.Id, beneficiary.Id))
-                .ReturnsAsync(500);
+                .ReturnsAsync(_appConstants.MonthlyLimitPerBeneficiary_VerifiedUser);
 
             // Act
             var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);
@@ -47,7 +63,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
             int charge = 1;
 
             _topUpTransactionRepositoryMock.Setup(repo => repo.SumTopUpsInCurrentMonthPerBeneficiary(user.Id, beneficiary.Id))
-                .ReturnsAsync(1000);
+                .ReturnsAsync(_appConstants.MonthlyLimitPerBeneficiary_UnVerifiedUser);
 
             // Act
             var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);
@@ -67,7 +83,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
             int charge = 1;
 
             _topUpTransactionRepositoryMock.Setup(repo => repo.SumTopUpsInCurrentMonthForAllBeneficiaries(user.Id))
-                .ReturnsAsync(3000);
+                .ReturnsAsync(_appConstants.MonthlyLimit);
 
             // Act
             var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);

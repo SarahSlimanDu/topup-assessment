@@ -1,6 +1,8 @@
 ﻿using Commons.Errors;
+using Microsoft.Extensions.Options;
 using TopUpBeneficiary.Application.Services.TopUp.Handlers.Base;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate;
+using TopUpBeneficiary.Domain.Commons.Constants;
 using TopUpBeneficiary.Domain.Errors;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
 using TopUpBeneficiary.Domain.UserAggregate;
@@ -10,9 +12,11 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
     public class CheckTopUpLimitsHandler : Handler
     {
         private readonly ITopUpTransactionRepository _topUpRepository;
-        public CheckTopUpLimitsHandler(ITopUpTransactionRepository topUpRepository)
+        private readonly AppConstants _appConstants;
+        public CheckTopUpLimitsHandler(ITopUpTransactionRepository topUpRepository, IOptions<AppConstants> constants)
         {
             _topUpRepository = topUpRepository;
+            _appConstants = constants.Value;
         }
 
         public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount, int charge)
@@ -20,12 +24,13 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
             var sumTopUpAmount = await _topUpRepository.SumTopUpsInCurrentMonthPerBeneficiary(user.Id, beneficiary.Id);
             var sumTopUpForUserBeneficiaries = await _topUpRepository.SumTopUpsInCurrentMonthForAllBeneficiaries(user.Id);
 
-            if (user.IsVerified && sumTopUpAmount >= 500 || !user.IsVerified && sumTopUpAmount >= 1000)
+            if (user.IsVerified && sumTopUpAmount >= _appConstants.MonthlyLimitPerBeneficiary_VerifiedUser || 
+                !user.IsVerified && sumTopUpAmount >= _appConstants.MonthlyLimitPerBeneficiary_UnVerifiedUser)
             {
 
                 return Result.Failure(TopUpTransactionErrors.ExceedBeneficiaryLimit());
             }
-            else if (sumTopUpForUserBeneficiaries >= 3000)
+            else if (sumTopUpForUserBeneficiaries >= _appConstants.MonthlyLimit)
             {
                 return Result.Failure(TopUpTransactionErrors.ExceedMonthlyLimit());
             }

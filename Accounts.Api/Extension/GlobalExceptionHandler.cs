@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TopUpBeneficiary.Api.Extension
+namespace Accounts.Api.Extension
 {
     public class GlobalExceptionHandler : IExceptionHandler
     {
