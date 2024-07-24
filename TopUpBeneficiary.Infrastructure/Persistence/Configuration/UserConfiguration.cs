@@ -17,12 +17,6 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Configuration
                 .HasConversion(
                   u => u.Value,
                   value => UserId.Create(value));
-
-            builder.Property(u => u.AccountId)
-                .ValueGeneratedNever()
-                .HasConversion(
-                  u => u.Value,
-                  value => AccountId.Create(value));
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿
-
-namespace TopUpBeneficiary.Domain.Commons.Constants;
+﻿namespace TopUpBeneficiary.Domain.Commons.Constants;
 
 public class AppConstants
 {

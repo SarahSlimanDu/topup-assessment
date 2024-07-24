@@ -5,7 +5,7 @@ namespace Accounts.Domain.Interface
 {
     public interface IAccountRepository
     {
-        Task<Account?> GetAccountById(AccountId accountId);
+        Task<Account?> GetAccountByIban(string accountIban);
         void UpdateAccount(Account account);
         Task<IEnumerable<Account>> GetAllAccounts();
         void Add(Account account);  

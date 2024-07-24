@@ -31,9 +31,9 @@ namespace AccountsService.UnitTests
         public async Task DebitBalance_ShouldReturnFailure_WhenAccountNotFound()
         {
             // Arrange
-            var request = new DebitBalanceRequest { AccountId = Guid.NewGuid(), DebitAmount = 100 };
+            var request = new DebitBalanceRequest { AccountIban = "DE89370400440532013000", DebitAmount = 100 };
 
-            _accountRepositoryMock.Setup(repo => repo.GetAccountById(It.IsAny<AccountId>()))
+            _accountRepositoryMock.Setup(repo => repo.GetAccountByIban(It.IsAny<string>()))
                 .ReturnsAsync((Account)null);
 
             // Act
@@ -52,9 +52,9 @@ namespace AccountsService.UnitTests
         {
             // Arrange
             var account = Account.Create("AED133424", "account@test.com", "P@ssw0rd", 10, "AED");
-            var request = new DebitBalanceRequest { AccountId = account.Id.Value, DebitAmount = 100 };
+            var request = new DebitBalanceRequest { AccountIban = account.Iban, DebitAmount = 100 };
 
-            _accountRepositoryMock.Setup(repo => repo.GetAccountById(It.IsAny<AccountId>()))
+            _accountRepositoryMock.Setup(repo => repo.GetAccountByIban(It.IsAny<string>()))
                 .ReturnsAsync(account);
 
             // Act
@@ -73,9 +73,9 @@ namespace AccountsService.UnitTests
         {
             // Arrange
             var account = Account.Create("AED133424", "account@test.com", "P@ssw0rd", 150, "AED");
-            var request = new DebitBalanceRequest { AccountId = account.Id.Value, DebitAmount = 100 };
+            var request = new DebitBalanceRequest { AccountIban = account.Iban, DebitAmount = 100 };
 
-            _accountRepositoryMock.Setup(repo => repo.GetAccountById(It.IsAny<AccountId>()))
+            _accountRepositoryMock.Setup(repo => repo.GetAccountByIban(It.IsAny<string>()))
                 .ReturnsAsync(account);
             _transactionRepositoryMock.Setup(repo => repo.Add(It.IsAny<Transaction>())).Verifiable();
             _accountRepositoryMock.Setup(repo => repo.UpdateAccount(It.IsAny<Account>())).Verifiable();

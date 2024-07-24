@@ -8,11 +8,11 @@ namespace TopUpBeneficiary.Domain.UserAggregate
     {
         public string Email { get; private set; }
         public bool IsVerified { get; private set; }
-        public AccountId AccountId { get; private set; }    
+        public string AccountId { get; private set; }    
         public DateTime CreatedDateTime { get; private set; }
         public DateTime UpdatedDateTime { get; private set; }
 
-        private User(UserId id, string email, bool isVerified, AccountId accountId, DateTime createdDateTime, DateTime updatedDateTime) : base(id)
+        private User(UserId id, string email, bool isVerified, string accountId, DateTime createdDateTime, DateTime updatedDateTime) : base(id)
         {
             Email = email;
             IsVerified = isVerified;
@@ -21,7 +21,7 @@ namespace TopUpBeneficiary.Domain.UserAggregate
             UpdatedDateTime = updatedDateTime;
         }
 
-        public static User Create(string email, bool isVerified, AccountId accountId)
+        public static User Create(string email, bool isVerified, string accountId)
         {
             return new(UserId.CreateUnique(),
                        email,

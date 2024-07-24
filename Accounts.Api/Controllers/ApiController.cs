@@ -20,6 +20,7 @@ namespace Accounts.Api.Controllers
                 ErrorTypes.Conflict => StatusCodes.Status409Conflict,
                 ErrorTypes.Validation => StatusCodes.Status400BadRequest,
                 ErrorTypes.NotFound => StatusCodes.Status404NotFound,
+                ErrorTypes.Unauthorized => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status500InternalServerError,
             };
 

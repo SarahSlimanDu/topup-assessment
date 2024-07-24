@@ -123,10 +123,10 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService
         public async Task TopUpBeneficiary_ShouldUpdateTransactionStatusToSuccess_WhenChainResultIsSuccess()
         {
             // Arrange
-            _accountClientMock.Setup(client => client.GetBalance(It.IsAny<AccountId>())).ReturnsAsync(Result.Success(new GetBalanceResponse { Balance = 100 }));
+            _accountClientMock.Setup(client => client.GetBalance(It.IsAny<string>())).ReturnsAsync(Result.Success(new GetBalanceResponse { Balance = 100 }));
             _accountClientMock.Setup(client => client.DebitBalance(It.IsAny<DebitBalanceDto>())).ReturnsAsync(Result.Success());
             _userRepositoryMock.Setup(repo => repo.GetById(It.IsAny<UserId>())).ReturnsAsync(UserFixtures.User);
-            _beneficiaryRepositoryMock.Setup(repo => repo.GetById(It.IsAny<BeneficiaryId>())).ReturnsAsync(BeneficiaryFixtures.ActiveBeneficiary);
+            _beneficiaryRepositoryMock.Setup(repo => repo.GetBeneficiaryByIdAndUserId(It.IsAny<BeneficiaryId>(), It.IsAny<UserId>())).ReturnsAsync(BeneficiaryFixtures.ActiveBeneficiary);
             _topUpOptionsRepositoryMock.Setup(repo => repo.GetById(It.IsAny<TopUpOptionId>())).ReturnsAsync(TopUpOptionsFixtures.TopUpOption);
             _topUpTransactionRepositoryMock.Setup(repo => repo.Add(It.IsAny<TopUpTransaction>())).Returns(TopUpBeneficiaryFixtures.TopUpTransaction);
             _unitOfWorkMock.Setup(uow => uow.Save()).Returns(Task.CompletedTask);
@@ -149,10 +149,10 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService
         public async Task TopUpBeneficiary_ShouldUpdateTransactionStatusToFailed_WhenChainResultIsFailed()
         {
             // Arrange
-            _accountClientMock.Setup(client => client.GetBalance(It.IsAny<AccountId>())).ReturnsAsync(Result.Success(new GetBalanceResponse { Balance = 0 }));
+            _accountClientMock.Setup(client => client.GetBalance(It.IsAny<string>())).ReturnsAsync(Result.Success(new GetBalanceResponse { Balance = 0 }));
             _accountClientMock.Setup(client => client.DebitBalance(It.IsAny<DebitBalanceDto>())).ReturnsAsync(Result.Success());
             _userRepositoryMock.Setup(repo => repo.GetById(It.IsAny<UserId>())).ReturnsAsync(UserFixtures.User);
-            _beneficiaryRepositoryMock.Setup(repo => repo.GetById(It.IsAny<BeneficiaryId>())).ReturnsAsync(BeneficiaryFixtures.ActiveBeneficiary);
+            _beneficiaryRepositoryMock.Setup(repo => repo.GetBeneficiaryByIdAndUserId(It.IsAny<BeneficiaryId>(), It.IsAny<UserId>())).ReturnsAsync(BeneficiaryFixtures.ActiveBeneficiary);
             _topUpOptionsRepositoryMock.Setup(repo => repo.GetById(It.IsAny<TopUpOptionId>())).ReturnsAsync(TopUpOptionsFixtures.TopUpOption);
             _topUpTransactionRepositoryMock.Setup(repo => repo.Add(It.IsAny<TopUpTransaction>())).Returns(TopUpBeneficiaryFixtures.TopUpTransaction);
             _unitOfWorkMock.Setup(uow => uow.Save()).Returns(Task.CompletedTask);

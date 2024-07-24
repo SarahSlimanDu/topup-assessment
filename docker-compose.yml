@@ -1,0 +1,51 @@
+version: '3.4'
+
+services:
+  topupbeneficiary.api:
+    image: ${DOCKER_REGISTRY-}topupbeneficiaryapi
+    container_name: topupbeneficiary.api
+    build:
+      context: .
+      dockerfile: TopUpBeneficiary.Api/Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=topupbeneficiary-db,1433;Database=TopUpBeneficiaryDb;User=sa;Password=P@ssw0rd1;Trusted_Connection=false;encrypt=false;
+    depends_on:
+      - topupbeneficiary-db
+      - accounts.api
+
+  topupbeneficiary-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: topupbeneficiary.database
+    environment:
+      SA_PASSWORD: "P@ssw0rd1"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+  
+  accounts.api:
+    image: ${DOCKER_REGISTRY-}accountsapi
+    container_name: accounts.api
+    build:
+      context: .
+      dockerfile: Accounts.Api/Dockerfile
+    ports:
+      - "5002:5002"
+      - "5003:5003"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=accounts-db,1433;Database=AccountsDb;User=sa;Password=P@ssw0rd2;Trusted_Connection=false;encrypt=false;
+    depends_on:
+      - accounts-db
+
+  accounts-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: accounts.database
+    environment:
+      SA_PASSWORD: "P@ssw0rd2"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1434:1433"

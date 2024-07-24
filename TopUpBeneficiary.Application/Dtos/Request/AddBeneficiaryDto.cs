@@ -9,6 +9,7 @@ namespace TopUpBeneficiary.Application.Dtos.Request
 
         [Required]
         [MaxLength(10)]
+        [Phone]
         public string PhoneNumber { get;  set; }
 
         [Required]

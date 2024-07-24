@@ -3,6 +3,7 @@
     public class AccountServiceSettings
     {
         public string BaseUrl { get; set; }
+        public string ApiKey { get; set; }  
         public Endpoints Endpoints { get; set; }
     }
     public class Endpoints

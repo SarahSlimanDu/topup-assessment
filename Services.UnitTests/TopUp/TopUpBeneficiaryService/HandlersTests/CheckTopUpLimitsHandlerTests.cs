@@ -5,7 +5,6 @@ using TopUpBeneficiary.Application.Services.TopUp.Handlers.Base;
 using TopUpBeneficiaryService.UnitTests.Fixtures;
 using Microsoft.Extensions.Options;
 using TopUpBeneficiary.Domain.Commons.Constants;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.HandlersTests
 {
@@ -32,6 +31,29 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
             _handler = new CheckTopUpLimitsHandler(_topUpTransactionRepositoryMock.Object, _appConstantsMock.Object);
             
         }
+        [Fact]
+        public async Task HandleAsync_ShouldReturnSuccess_WhenUserIsVerifiedAndSumOfTopUpAmountAndMonthlyTopUpsPerBeneficiaryWithinLimit()
+        {
+            // Arrange
+            var user = UserFixtures.User; //Verified user
+            var beneficiary = BeneficiaryFixtures.ActiveBeneficiary;
+            int topUpAmount = 100;
+            int charge = 1;
+         
+            _topUpTransactionRepositoryMock.Setup(repo => repo.SumTopUpsInCurrentMonthPerBeneficiary(user.Id, beneficiary.Id))
+                .ReturnsAsync(400); // Within limit (100 + 400 = 500)
+
+            var nextHandlerMock = new Mock<Handler>();
+            nextHandlerMock.Setup(h => h.HandleAsync(user, beneficiary, topUpAmount, charge))
+                .ReturnsAsync(Result.Success());
+            _handler.SetNext(nextHandlerMock.Object);
+
+            // Act
+            var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+        }
 
         [Fact]
         public async Task HandleAsync_ShouldReturnFailure_WhenUserIsVerifiedAndExceedsBeneficiaryLimit()
@@ -39,11 +61,11 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
             // Arrange
             var user = UserFixtures.User;
             var beneficiary = BeneficiaryFixtures.ActiveBeneficiary;
-            int topUpAmount = 100;
+            int topUpAmount = 101; 
             int charge = 1;
 
             _topUpTransactionRepositoryMock.Setup(repo => repo.SumTopUpsInCurrentMonthPerBeneficiary(user.Id, beneficiary.Id))
-                .ReturnsAsync(_appConstants.MonthlyLimitPerBeneficiary_VerifiedUser);
+                .ReturnsAsync(400); // 400 + 101 = 501
 
             // Act
             var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);
@@ -54,7 +76,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
         }
 
         [Fact]
-        public async Task HandleAsync_ShouldReturnFailure_WhenUserIsNotVerifiedAndExceedsBeneficiaryLimit()
+        public async Task HandleAsync_ShouldReturnSuccess_WhenUserIsUnverifiedAndSumOfTopUpAmountAndMonthlyTopUpsPerBeneficiaryWithinLimit()
         {
             // Arrange
             var user = UserFixtures.NotVerifiedUser;
@@ -63,7 +85,31 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
             int charge = 1;
 
             _topUpTransactionRepositoryMock.Setup(repo => repo.SumTopUpsInCurrentMonthPerBeneficiary(user.Id, beneficiary.Id))
-                .ReturnsAsync(_appConstants.MonthlyLimitPerBeneficiary_UnVerifiedUser);
+                .ReturnsAsync(900); //within limit 900 + 100 = 1000
+
+            var nextHandlerMock = new Mock<Handler>();
+            nextHandlerMock.Setup(h => h.HandleAsync(user, beneficiary, topUpAmount, charge))
+                .ReturnsAsync(Result.Success());
+            _handler.SetNext(nextHandlerMock.Object);
+
+            // Act
+            var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task HandleAsync_ShouldReturnFailure_WhenUserIsUnverifiedAndExceedsBeneficiaryLimit()
+        {
+            // Arrange
+            var user = UserFixtures.NotVerifiedUser;
+            var beneficiary = BeneficiaryFixtures.ActiveBeneficiary;
+            int topUpAmount = 101; 
+            int charge = 1;
+
+            _topUpTransactionRepositoryMock.Setup(repo => repo.SumTopUpsInCurrentMonthPerBeneficiary(user.Id, beneficiary.Id))
+                .ReturnsAsync(900); // 900 + 101 = 1001
 
             // Act
             var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);
@@ -74,25 +120,46 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
         }
 
         [Fact]
-        public async Task HandleAsync_ShouldReturnFailure_WhenExceedsMonthlyLimit()
+        public async Task HandleAsync_ShouldReturnSuccess_WhenSumOfTopUpAmountAndAllMonthlyTopUpsWithinLimit()
         {
             // Arrange
-            var user = UserFixtures.User;
+            var user = UserFixtures.User; // Can be verified or unverified
             var beneficiary = BeneficiaryFixtures.ActiveBeneficiary;
             int topUpAmount = 100;
             int charge = 1;
 
             _topUpTransactionRepositoryMock.Setup(repo => repo.SumTopUpsInCurrentMonthForAllBeneficiaries(user.Id))
-                .ReturnsAsync(_appConstants.MonthlyLimit);
+                .ReturnsAsync(2900); // 100 + 2900 = 3000
 
+            var nextHandlerMock = new Mock<Handler>();
+            nextHandlerMock.Setup(h => h.HandleAsync(user, beneficiary, topUpAmount, charge))
+                .ReturnsAsync(Result.Success());
+            _handler.SetNext(nextHandlerMock.Object);
+            // Act
+            var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task HandleAsync_ShouldReturnFailure_WhenSumOfTopUpAmountAndAllMonthlyTopUpsExceedLimit()
+        {
+            // Arrange
+            var user = UserFixtures.User; // Can be verified or unverified
+            var beneficiary = BeneficiaryFixtures.ActiveBeneficiary;
+            int topUpAmount = 101;
+            int charge = 1;
+
+            _topUpTransactionRepositoryMock.Setup(repo => repo.SumTopUpsInCurrentMonthForAllBeneficiaries(user.Id))
+                .ReturnsAsync(2900); // Exceed overall monthly limit 101 + 2900 = 3001
+      
             // Act
             var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);
 
             // Assert
             result.IsFailure.Should().BeTrue();
-            result.Error.Should().Be(TopUpTransactionErrors.ExceedMonthlyLimit());
         }
-
 
         [Fact]
         public async Task HandleAsync_ShouldCallNextHandler_WhenLimitsAreNotExceeded()

@@ -28,7 +28,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
             int charge = 1;
 
             _accountClientMock.Setup(client => client.GetBalance(user.AccountId))
-                .ReturnsAsync(Result.Success(new GetBalanceResponse {AccountId = user.AccountId.Value, Balance = 50 }));
+                .ReturnsAsync(Result.Success(new GetBalanceResponse {AccountIban = user.AccountId, Balance = 50 }));
 
             // Act
             var result = await _handler.HandleAsync(user, beneficiary, topUpAmount, charge);
@@ -48,7 +48,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
             int charge = 1;
 
             _accountClientMock.Setup(client => client.GetBalance(user.AccountId))
-                .ReturnsAsync(Result.Success(new GetBalanceResponse { AccountId = user.AccountId.Value, Balance = 101 }));
+                .ReturnsAsync(Result.Success(new GetBalanceResponse { AccountIban = user.AccountId, Balance = 101 }));
 
             var nextHandlerMock = new Mock<Handler>();
             nextHandlerMock.Setup(h => h.HandleAsync(user, beneficiary, topUpAmount, charge))

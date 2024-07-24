@@ -27,8 +27,8 @@ namespace TopUpBeneficiary.Api
             var users = await userRepository.GetAll();
             if(users.Count() == 0)
             {
-                userRepository.Add(User.Create("test1@topup.com", true, AccountId.Create(Guid.Parse("9e613bd1-b1f4-4549-a120-060f2ad254fe"))));
-                userRepository.Add(User.Create("test2@topup.com", false, AccountId.Create(Guid.Parse("103203af-81ee-479a-bce1-0b7621a4831f"))));
+                userRepository.Add(User.Create("test1@topup.com", true, "DE89370400440532013000"));
+                userRepository.Add(User.Create("test2@topup.com", false, "DE89370400440532013111"));
                 await unitOfWork.Save();
             }
             #endregion

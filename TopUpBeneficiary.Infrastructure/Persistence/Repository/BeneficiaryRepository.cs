@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using TopUpBeneficiary.Domain.BeneficiaryAggregate;
+using TopUpBeneficiary.Domain.BeneficiaryAggregate.ValueObjects;
 using TopUpBeneficiary.Domain.Persistence.Interfaces.Repository;
 using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
 using TopUpBeneficiary.Infrastructure.Persistence.Commons;
@@ -17,6 +18,12 @@ namespace TopUpBeneficiary.Infrastructure.Persistence.Repository
         {
             return await _context.Set<Beneficiary>().Where(b => b.UserId == userId
                                                              && b.IsActive).ToListAsync();
+        }
+
+        public async Task<Beneficiary?> GetBeneficiaryByIdAndUserId(BeneficiaryId beneficiaryId, UserId userId)
+        {
+            return await _context.Set<Beneficiary>().SingleOrDefaultAsync(b => b.Id == beneficiaryId &&
+                                                                               b.UserId == userId); 
         }
     }
 }

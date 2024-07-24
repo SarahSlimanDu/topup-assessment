@@ -7,7 +7,7 @@ namespace TopUpBeneficiary.Application.SyncDataService.WebService.Client
 {
     public interface IAccountClient
     {
-        Task<Result<GetBalanceResponse>> GetBalance(AccountId accountId);
+        Task<Result<GetBalanceResponse>> GetBalance(string accountId);
         Task<Result> DebitBalance(DebitBalanceDto debitBalance);
     }
 }

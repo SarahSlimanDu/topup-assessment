@@ -24,20 +24,22 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
             var sumTopUpAmount = await _topUpRepository.SumTopUpsInCurrentMonthPerBeneficiary(user.Id, beneficiary.Id);
             var sumTopUpForUserBeneficiaries = await _topUpRepository.SumTopUpsInCurrentMonthForAllBeneficiaries(user.Id);
 
-            if (user.IsVerified && sumTopUpAmount >= _appConstants.MonthlyLimitPerBeneficiary_VerifiedUser || 
-                !user.IsVerified && sumTopUpAmount >= _appConstants.MonthlyLimitPerBeneficiary_UnVerifiedUser)
+            if (user.IsVerified && sumTopUpAmount + topUpAmount > _appConstants.MonthlyLimitPerBeneficiary_VerifiedUser)
+            {
+                return Result.Failure(TopUpTransactionErrors.ExceedBeneficiaryLimit());
+            }
+            else if (!user.IsVerified && sumTopUpAmount + topUpAmount > _appConstants.MonthlyLimitPerBeneficiary_UnVerifiedUser)
             {
 
                 return Result.Failure(TopUpTransactionErrors.ExceedBeneficiaryLimit());
             }
-            else if (sumTopUpForUserBeneficiaries >= _appConstants.MonthlyLimit)
+
+            if (sumTopUpForUserBeneficiaries + topUpAmount > _appConstants.MonthlyLimit)
             {
                 return Result.Failure(TopUpTransactionErrors.ExceedMonthlyLimit());
             }
-            else
-            {
-                return await base.HandleAsync(user, beneficiary, topUpAmount, charge);
-            }
+
+            return await base.HandleAsync(user, beneficiary, topUpAmount, charge);
         }
     }
 }

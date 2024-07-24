@@ -26,7 +26,7 @@ namespace TopUpBeneficiaryService.UnitTests.TopUp.TopUpBeneficiaryService.Handle
             int topUpAmount = 100;
             int charge = 1;
 
-            _accountClientMock.Setup(client => client.DebitBalance(It.Is<DebitBalanceDto>(d => d.accountId == user.AccountId.Value && d.debitAmount == topUpAmount + charge)))
+            _accountClientMock.Setup(client => client.DebitBalance(It.Is<DebitBalanceDto>(d => d.accountIban == user.AccountId && d.debitAmount == topUpAmount + charge)))
                 .ReturnsAsync(Result.Success());
 
             // Act

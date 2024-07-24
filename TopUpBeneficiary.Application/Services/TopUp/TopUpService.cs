@@ -66,7 +66,7 @@ namespace TopUpBeneficiary.Application.Services.TopUp
             if (user is null)
                 return Result.Failure(UserErrors.NotFoundById());
 
-            var beneficiary = await _beneficiaryRepository.GetById(BeneficiaryId.Create(topUpRequest.BeneficiaryId));
+            var beneficiary = await _beneficiaryRepository.GetBeneficiaryByIdAndUserId(BeneficiaryId.Create(topUpRequest.BeneficiaryId), user.Id);
             if (beneficiary is null)
                 return Result.Failure(BeneficiaryErrors.NotFoundById());
 
@@ -103,7 +103,8 @@ namespace TopUpBeneficiary.Application.Services.TopUp
                 return Result.Failure<IList<TopUpOptionsDto>>(TopUpOptionsErrors.NoOptionsFound());
             }
 
-           var result =  _mapper.Map<IList<TopUpOptionsDto>>(topUpOptions.ToList());
+           var orderList = topUpOptions.OrderBy(t => t.Amount).ToList();   
+           var result =  _mapper.Map<IList<TopUpOptionsDto>>(orderList);
             return Result.Success(result);
         }
 

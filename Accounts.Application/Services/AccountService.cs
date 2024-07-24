@@ -22,7 +22,7 @@ namespace Accounts.Application.Services
         }
         public async Task<Result> DebitBalance(DebitBalanceRequest request)
         {
-            var account = await _accountRepository.GetAccountById(AccountId.Create(request.AccountId));
+            var account = await _accountRepository.GetAccountByIban(request.AccountIban);
             if (account is null)
             {
                 return Result.Failure<GetBalanceResponse>(AccountErrors.NotFoundById());
@@ -32,7 +32,7 @@ namespace Accounts.Application.Services
             {
                 return Result.Failure<GetBalanceResponse>(AccountErrors.NoEnoughBalance());
             }
-            _transactionRepository.Add(Transaction.Create(AccountId.Create(request.AccountId),TransactionType.Debit.ToString(), request.DebitAmount));
+            _transactionRepository.Add(Transaction.Create(account.Id,TransactionType.Debit.ToString(), request.DebitAmount));
          
             account.DebitBalance(request.DebitAmount);
 
@@ -43,16 +43,16 @@ namespace Accounts.Application.Services
             return Result.Success();    
         }
 
-        public async Task<Result<GetBalanceResponse>> GetBalance(Guid accountId)
+        public async Task<Result<GetBalanceResponse>> GetBalance(string accountIban)
         {
           
-            var account = await _accountRepository.GetAccountById(AccountId.Create(accountId));
+            var account = await _accountRepository.GetAccountByIban(accountIban);
 
             if(account is null)
             {
                 return Result.Failure<GetBalanceResponse>(AccountErrors.NotFoundById());
             }
-            return Result.Success(new GetBalanceResponse { AccountId = account.Id.Value, Balance = account.Balance});
+            return Result.Success(new GetBalanceResponse { AccountIban = accountIban, Balance = account.Balance});
 
         }
     }

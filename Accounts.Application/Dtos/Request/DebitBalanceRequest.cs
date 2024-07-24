@@ -2,7 +2,7 @@
 {
     public sealed record DebitBalanceRequest
     {
-        public Guid AccountId {  get; set; }    
+        public string AccountIban {  get; set; }    
         public decimal DebitAmount {  get; set; }    
     }
 }

@@ -17,7 +17,7 @@ namespace TopUpBeneficiary.Application.Services.TopUp.Handlers.Concrete
         }
         public override async Task<Result> HandleAsync(User user, Beneficiary beneficiary, int topUpAmount, int charge)
         {
-            var debitBalance = new DebitBalanceDto(user.AccountId.Value, topUpAmount + charge);
+            var debitBalance = new DebitBalanceDto(user.AccountId, topUpAmount + charge);
             var result = await _accountClient.DebitBalance(debitBalance);
 
             return result;

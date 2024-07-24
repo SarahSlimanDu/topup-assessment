@@ -2,10 +2,11 @@
 using Commons.HttpRequestBuild;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Net;
+using System.Net.Http;
 using TopUpBeneficiary.Application.Dtos.Request;
 using TopUpBeneficiary.Application.SyncDataService.WebService.Response;
 using TopUpBeneficiary.Application.SyncDataService.WebService.Settings;
-using TopUpBeneficiary.Domain.UserAggregate.ValueObjects;
 
 namespace TopUpBeneficiary.Application.SyncDataService.WebService.Client
 {
@@ -15,13 +16,18 @@ namespace TopUpBeneficiary.Application.SyncDataService.WebService.Client
         private readonly AccountServiceSettings _settings;
         public AccountClient(HttpClient httpClient, IOptions<AccountServiceSettings> settings)
         {
-            _httpClient = httpClient;
+            var handler = new CustomHttpClientHandler();
+            //   _httpClient = httpClient;
+            _httpClient = new HttpClient(handler);
             _settings = settings.Value;
+
+            
         }
-        public async Task<Result<GetBalanceResponse>> GetBalance(AccountId accountId)
+        public async Task<Result<GetBalanceResponse>> GetBalance(string accountIban)
         {
             var request = HttpRequestBuilder.Create(_settings.BaseUrl,
-                _settings.Endpoints.GetBalance.Replace("{accountId}", accountId.Value.ToString()), HttpMethod.Get).Build();
+                _settings.Endpoints.GetBalance.Replace("{accountIban}", accountIban), HttpMethod.Get)
+                                   .AddQueryString(new KeyValuePair<string, string>("key", _settings.ApiKey)).Build();
 
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
@@ -42,8 +48,10 @@ namespace TopUpBeneficiary.Application.SyncDataService.WebService.Client
         public async Task<Result> DebitBalance(DebitBalanceDto debitBalance)
         {
             var body = JsonConvert.SerializeObject(debitBalance);
+
             var request = HttpRequestBuilder.Create(_settings.BaseUrl,
-                _settings.Endpoints.DebitBalance, HttpMethod.Post).SetRequestBody(body).Build();
+                _settings.Endpoints.DebitBalance, HttpMethod.Post).SetRequestBody(body)
+                          .AddQueryString(new KeyValuePair<string, string>("key", _settings.ApiKey)).Build();
 
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();

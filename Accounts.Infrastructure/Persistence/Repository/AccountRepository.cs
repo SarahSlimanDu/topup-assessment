@@ -19,9 +19,9 @@ namespace Accounts.Infrastructure.Persistence.Repository
            _dbSet.Add(account); 
         }
 
-        public async Task<Account?> GetAccountById(AccountId accountId)
+        public async Task<Account?> GetAccountByIban(string accountIban)
         {
-            return await _dbSet.SingleOrDefaultAsync(a => a.Id == accountId);
+            return await _dbSet.SingleOrDefaultAsync(a => a.Iban == accountIban);
         }
 
         public async Task<IEnumerable<Account>> GetAllAccounts()

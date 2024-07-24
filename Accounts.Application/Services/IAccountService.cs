@@ -6,7 +6,7 @@ namespace Accounts.Application.Services
 {
     public interface IAccountService
     {
-        Task<Result<GetBalanceResponse>> GetBalance(Guid accountId);
+        Task<Result<GetBalanceResponse>> GetBalance(string accountId);
         Task<Result> DebitBalance(DebitBalanceRequest request);
     }
 }
